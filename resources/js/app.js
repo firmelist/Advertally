@@ -1,110 +1,89 @@
-import Alpine from 'alpinejs';
-import collapse from '@alpinejs/collapse';
-
-Alpine.plugin(collapse);
-
-/**
- * Analytics helper — pushes events to GTM dataLayer / gtag / Meta Pixel when present.
+/*
+ * Livewire ships Alpine with collapse, intersect, focus, anchor and mask already registered —
+ * one runtime, no duplicate plugins.
  */
+import { Livewire, Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm';
+
+document.documentElement.classList.add('js');
+
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/** Analytics helper — pushes to GTM dataLayer / gtag when present. Never breaks the page. */
 window.track = (event, params = {}) => {
     try {
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({ event, ...params });
         if (typeof window.gtag === 'function') window.gtag('event', event, params);
-        if (typeof window.fbq === 'function' && event === 'generate_lead') window.fbq('track', 'Lead', params);
-    } catch (e) { /* never break the page for analytics */ }
+    } catch (e) { /* ignore */ }
 };
 
-// Global click tracking for WhatsApp & call links
 document.addEventListener('click', (e) => {
-    const a = e.target.closest('a');
-    if (!a) return;
-    if (a.href.includes('wa.me/')) window.track('whatsapp_click', { page: location.pathname });
-    if (a.href.startsWith('tel:')) window.track('call_click', { page: location.pathname });
+    const el = e.target.closest('[data-track]');
+    if (el) window.track(el.dataset.track, { label: el.dataset.trackLabel || el.textContent.trim().slice(0, 60), page: location.pathname });
 });
 
-/**
- * Exit-intent popup (desktop only, once per 7 days).
- */
-Alpine.data('exitIntent', () => ({
-    open: false,
-    init() {
-        if (window.matchMedia('(max-width: 1023px)').matches) return;
-        if (document.cookie.includes('adv_exit=1')) return;
-        const handler = (e) => {
-            if (e.clientY <= 0) {
-                this.open = true;
-                document.cookie = 'adv_exit=1; max-age=' + 60 * 60 * 24 * 7 + '; path=/; SameSite=Lax';
-                document.removeEventListener('mouseout', handler);
-            }
+/** Section reveals — progressive enhancement, skipped for reduced motion. */
+const revealObserver = !reducedMotion && 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries) => entries.forEach((entry) => {
+        if (entry.isIntersecting) { entry.target.classList.add('is-visible'); revealObserver.unobserve(entry.target); }
+    }), { rootMargin: '0px 0px -8% 0px' })
+    : null;
+
+const initReveal = () => document.querySelectorAll('[data-reveal]:not(.is-visible)').forEach((el) => {
+    revealObserver ? revealObserver.observe(el) : el.classList.add('is-visible');
+});
+
+document.addEventListener('DOMContentLoaded', initReveal);
+document.addEventListener('livewire:navigated', initReveal);
+
+/** Count-up metric: <span x-data="counter(428)" x-intersect.once="start()" x-text="display"> */
+Alpine.data('counter', (target = 0, { decimals = 0, prefix = '', suffix = '', duration = 1400 } = {}) => ({
+    display: prefix + Number(target).toLocaleString('en-IN', { maximumFractionDigits: decimals }) + suffix,
+    start() {
+        if (reducedMotion) return;
+        const t0 = performance.now();
+        const tick = (now) => {
+            const p = Math.min(1, (now - t0) / duration);
+            const eased = 1 - Math.pow(1 - p, 3);
+            this.display = prefix + (target * eased).toLocaleString('en-IN', { maximumFractionDigits: decimals, minimumFractionDigits: p < 1 ? 0 : decimals }) + suffix;
+            if (p < 1) requestAnimationFrame(tick);
         };
-        setTimeout(() => document.addEventListener('mouseout', handler), 8000);
+        requestAnimationFrame(tick);
     },
 }));
 
-/**
- * Cookie consent.
- */
+/** Score ring: animates stroke from 0 to the score. */
+Alpine.data('scoreRing', (score = 0) => ({
+    value: reducedMotion ? score : 0,
+    start() {
+        if (reducedMotion) return;
+        requestAnimationFrame(() => { this.value = score; });
+    },
+}));
+
+/** Desktop mega menu with hover-intent + keyboard support. */
+Alpine.data('megaMenu', () => ({
+    open: null,
+    timer: null,
+    show(id) { clearTimeout(this.timer); this.open = id; },
+    hide() { this.timer = setTimeout(() => { this.open = null; }, 140); },
+    toggle(id) { this.open = this.open === id ? null : id; },
+    close() { this.open = null; },
+}));
+
+/** Cookie consent — analytics tags load only after "Accept". */
 Alpine.data('cookieConsent', () => ({
     show: false,
-    init() { this.show = !document.cookie.includes('adv_consent='); },
+    init() {
+        const choice = (document.cookie.match(/(?:^|; )adv_consent=([^;]+)/) || [])[1];
+        if (!choice) this.show = true;
+        if (choice === 'all') window.dispatchEvent(new Event('adv:consent'));
+    },
     choose(value) {
-        document.cookie = 'adv_consent=' + value + '; max-age=' + 60 * 60 * 24 * 365 + '; path=/; SameSite=Lax';
+        document.cookie = `adv_consent=${value}; max-age=${60 * 60 * 24 * 365}; path=/; SameSite=Lax`;
         this.show = false;
         if (value === 'all') window.dispatchEvent(new Event('adv:consent'));
     },
 }));
 
-/**
- * "Build your own plan" pricing calculator.
- * items: [{key, label, group, price, unit}] ; billing discount applied client-side,
- * final selection is posted as a quote request (lead).
- */
-Alpine.data('planBuilder', (items = [], discounts = {}) => ({
-    items,
-    discounts,
-    billing: 'monthly',
-    selected: [],
-    toggle(key) {
-        this.selected = this.selected.includes(key)
-            ? this.selected.filter((k) => k !== key)
-            : [...this.selected, key];
-        if (this.selected.length === 1) window.track('pricing_calculator_used');
-    },
-    get monthly() {
-        return this.items.filter((i) => this.selected.includes(i.key) && i.unit === 'month')
-            .reduce((t, i) => t + i.price, 0);
-    },
-    get oneTime() {
-        return this.items.filter((i) => this.selected.includes(i.key) && i.unit === 'one-time')
-            .reduce((t, i) => t + i.price, 0);
-    },
-    get bundleDiscount() {
-        // SME bundle: marketing + website + CRM together → extra 10% off monthly
-        const groups = new Set(this.items.filter((i) => this.selected.includes(i.key)).map((i) => i.group));
-        return groups.has('marketing') && groups.has('websites') && groups.has('crm') ? 0.10 : 0;
-    },
-    get effectiveMonthly() {
-        const d = (this.discounts[this.billing] || 0) + this.bundleDiscount;
-        return Math.round(this.monthly * (1 - d));
-    },
-    get summary() {
-        return this.items.filter((i) => this.selected.includes(i.key)).map((i) => i.label).join(', ');
-    },
-    inr(n) { return '₹' + Number(n).toLocaleString('en-IN'); },
-}));
-
-/**
- * Marketing ROI calculator.
- */
-Alpine.data('roiCalc', () => ({
-    spend: 30000, cpl: 400, close: 10, order: 25000,
-    get leads() { return Math.round(this.spend / Math.max(this.cpl, 1)); },
-    get customers() { return Math.round(this.leads * this.close / 100); },
-    get revenue() { return this.customers * this.order; },
-    get roi() { return this.spend ? Math.round(((this.revenue - this.spend) / this.spend) * 100) : 0; },
-    inr(n) { return '₹' + Number(n).toLocaleString('en-IN'); },
-}));
-
-window.Alpine = Alpine;
-Alpine.start();
+Livewire.start();

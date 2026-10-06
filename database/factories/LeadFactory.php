@@ -14,28 +14,20 @@ class LeadFactory extends Factory
 
     public function definition(): array
     {
-        $services = fake()->randomElements(array_keys(Lead::SERVICE_OPTIONS), fake()->numberBetween(1, 3));
-
         return [
             'name' => fake()->name(),
             'company' => fake()->company(),
-            'phone' => '9'.fake()->numerify('#########'),
-            'email' => fake()->safeEmail(),
-            'city' => fake()->randomElement(['Gurugram', 'Delhi', 'Noida', 'Mumbai', 'Pune', 'Bengaluru', 'Ahmedabad', 'Jaipur']),
-            'business_size' => fake()->randomElement(['micro', 'small', 'small', 'medium']),
+            'email' => fake()->unique()->companyEmail(),
+            'website' => fake()->domainName(),
             'industry' => fake()->randomElement(array_keys(config('advertally.industries'))),
-            'services' => $services,
+            'service_interest' => fake()->randomElement(array_keys(config('advertally.service_interests'))),
             'budget' => fake()->randomElement(array_keys(config('advertally.budgets'))),
             'message' => fake()->sentence(12),
-            'form_type' => fake()->randomElement(array_keys(Lead::FORM_TYPES)),
-            'source_page' => '/',
-            'utm_source' => fake()->randomElement(['google', 'facebook', 'instagram', 'linkedin', null, null]),
-            'utm_medium' => fake()->randomElement(['cpc', 'organic', 'social', null]),
-            'status' => fake()->randomElement(array_keys(config('advertally.lead_statuses'))),
+            'form_type' => 'contact',
+            'source' => fake()->randomElement(['direct', 'organic:google', 'linkedin-ads', 'ai:chatgpt']),
+            'status' => fake()->randomElement(array_keys(Lead::STATUSES)),
             'score' => fake()->numberBetween(10, 90),
-            'device' => fake()->randomElement(['mobile', 'mobile', 'desktop']),
             'consent' => true,
-            'created_at' => fake()->dateTimeBetween('-45 days'),
         ];
     }
 }

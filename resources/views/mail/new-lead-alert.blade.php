@@ -1,35 +1,31 @@
 <x-mail::message>
-# New {{ strtoupper($lead->temperature) }} lead — score {{ $lead->score }}/100
+# New lead: {{ $lead->name }}
 
-**{{ $lead->name }}**{{ $lead->company ? ' · '.$lead->company : '' }}
+**{{ $lead->label('form_type') }}** · fit score **{{ $lead->score }}/100**
 
 <x-mail::table>
-| Field | Details |
-|:------|:--------|
-| Phone | {{ $lead->phone }} |
-| Email | {{ $lead->email ?: '—' }} |
-| City | {{ $lead->city ?: '—' }} |
-| Business size | {{ config('advertally.business_sizes')[$lead->business_size] ?? '—' }} |
-| Budget | {{ config('advertally.budgets')[$lead->budget] ?? '—' }} |
-| Interested in | {{ $lead->services_label ?: '—' }} |
-| Form | {{ \App\Models\Lead::FORM_TYPES[$lead->form_type] ?? $lead->form_type }} |
-| Source | {{ $lead->utm_source ?: 'Direct / organic' }}{{ $lead->utm_campaign ? ' · '.$lead->utm_campaign : '' }} |
-| Page | {{ $lead->source_page ?: '—' }} |
-| Assigned to | {{ $lead->assignee?->name ?? 'Unassigned' }} |
+| | |
+|:--|:--|
+| Company | {{ $lead->company ?: '—' }} |
+| Email | {{ $lead->email }} |
+| Phone | {{ $lead->phone ?: '—' }} |
+| Website | {{ $lead->website ?: '—' }} |
+| Industry | {{ $lead->label('industry') ?: '—' }} |
+| Interest | {{ $lead->label('service_interest') ?: '—' }} |
+| Challenge | {{ $lead->label('challenge') ?: '—' }} |
+| Objective | {{ $lead->label('objective') ?: '—' }} |
+| Budget | {{ $lead->label('budget') ?: '—' }} |
+| Source | {{ $lead->source ?: 'direct' }}{{ $lead->utm_campaign ? ' · '.$lead->utm_campaign : '' }} |
+| First touch | {{ $lead->first_touch_source ?: '—' }} |
 </x-mail::table>
 
 @if ($lead->message)
-**Message:**
+**Message**
+
 {{ $lead->message }}
 @endif
 
-<x-mail::button :url="$lead->whatsapp_url" color="success">
-WhatsApp {{ explode(' ', $lead->name)[0] }} now
-</x-mail::button>
-
 <x-mail::button :url="url('/admin/leads/'.$lead->id)">
-Open in CRM
+Open in admin
 </x-mail::button>
-
-Speed matters: leads contacted within 5 minutes are far more likely to convert.
 </x-mail::message>

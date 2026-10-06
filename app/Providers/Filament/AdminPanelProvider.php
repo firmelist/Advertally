@@ -7,6 +7,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
+use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -31,22 +32,26 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Advertally')
             ->favicon(asset('favicon.svg'))
             ->colors([
-                'primary' => Color::hex('#2952CC'),
-                'warning' => Color::hex('#F26B1D'),
-                'success' => Color::hex('#0F766E'),
+                'primary' => Color::hex('#2563EB'),
+                'success' => Color::hex('#16A34A'),
+                'info' => Color::hex('#06B6D4'),
                 'gray' => Color::Slate,
             ])
-            ->font('Inter')
+            ->font('Plus Jakarta Sans')
             ->sidebarCollapsibleOnDesktop()
+            ->maxContentWidth('full')
             ->databaseNotifications()
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->navigationGroups([
-                NavigationGroup::make('Sales'),
-                NavigationGroup::make('Website Content'),
-                NavigationGroup::make('Settings')->collapsed(),
+                NavigationGroup::make('Growth')->icon('heroicon-o-arrow-trending-up'),
+                NavigationGroup::make('Website Content')->icon('heroicon-o-document-text'),
+                NavigationGroup::make('Growth Score')->icon('heroicon-o-chart-pie')->collapsed(),
+                NavigationGroup::make('Site')->icon('heroicon-o-globe-alt')->collapsed(),
+                NavigationGroup::make('System')->icon('heroicon-o-lock-closed')->collapsed(),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
-            ->pages([\Filament\Pages\Dashboard::class])
+            ->pages([Dashboard::class])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->middleware([
                 EncryptCookies::class,

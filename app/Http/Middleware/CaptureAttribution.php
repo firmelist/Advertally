@@ -2,43 +2,39 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\Attribution;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Stores first-touch marketing attribution (UTM, click IDs, referrer, landing page)
- * and a page-view counter in the session, so every lead knows where it came from.
+ * First-touch attribution lives in a 90-day cookie (survives sessions);
+ * last-touch lives in the session and is replaced by every new campaign click or external referral.
  */
 class CaptureAttribution
 {
-    public const KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'];
+    public function __construct(private Attribution $attribution) {}
 
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->isMethod('GET') && ! $request->ajax() && ! $request->is('admin*', 'livewire*', 'up')) {
-            $session = $request->session();
+        $tracked = $request->isMethod('GET')
+            && ! $request->ajax()
+            && ! $request->is('admin*', 'livewire*', 'up', 'sitemap.xml', 'robots.txt', 'llms.txt', 'build/*', 'storage/*');
 
-            if (! $session->has('attribution')) {
-                $referrer = (string) $request->headers->get('referer', '');
-                $isInternal = $referrer && str_contains($referrer, $request->getHost());
+        $touch = $tracked ? $this->attribution->touchFrom($request) : null;
 
-                $session->put('attribution', array_filter([
-                    ...$request->only(self::KEYS),
-                    'referrer' => $isInternal ? null : mb_substr($referrer, 0, 500),
-                    'landing_page' => mb_substr($request->fullUrl(), 0, 500),
-                ]));
-            } elseif ($request->hasAny(self::KEYS)) {
-                // A new campaign click overrides UTM values but keeps the original landing page.
-                $session->put('attribution', array_merge(
-                    $session->get('attribution', []),
-                    array_filter($request->only(self::KEYS)),
-                ));
-            }
-
-            $session->put('pages_viewed', (int) $session->get('pages_viewed', 0) + 1);
+        if ($touch && $this->attribution->isCampaignTouch($touch)) {
+            $request->session()->put(Attribution::SESSION_KEY, $touch);
+        } elseif ($touch && ! $request->session()->has(Attribution::SESSION_KEY)) {
+            $request->session()->put(Attribution::SESSION_KEY, $touch);
         }
 
-        return $next($request);
+        $response = $next($request);
+
+        if ($touch && ! $request->cookies->has(Attribution::COOKIE)) {
+            $response->headers->setCookie(cookie(Attribution::COOKIE, json_encode($touch), 60 * 24 * 90, null, null, null, true, false, 'Lax'));
+        }
+
+        return $response;
     }
 }

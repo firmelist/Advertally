@@ -2,93 +2,70 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Concerns\HasSeo;
+use App\Models\Concerns\LogsActivity;
+use App\Models\Concerns\Publishable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Service extends Model
 {
-    protected $guarded = ['id'];
+    use HasFactory, HasSeo, LogsActivity, Publishable;
 
-    protected function casts(): array
+    protected $fillable = [
+        'service_category_id', 'title', 'slug', 'short_description', 'hero_title', 'hero_subtitle', 'long_description',
+        'benefits', 'deliverables', 'process', 'faqs', 'icon', 'is_featured', 'status', 'sort_order',
+    ];
+
+    protected $casts = [
+        'benefits' => 'array', 'deliverables' => 'array', 'process' => 'array', 'faqs' => 'array', 'is_featured' => 'boolean',
+    ];
+
+    public function category(): BelongsTo
     {
-        return [
-            'problems' => 'array',
-            'deliverables' => 'array',
-            'process' => 'array',
-            'rate_card' => 'array',
-            'is_featured' => 'boolean',
-            'is_active' => 'boolean',
-        ];
+        return $this->belongsTo(ServiceCategory::class, 'service_category_id');
     }
 
-    protected static function booted(): void
+    public function related(): BelongsToMany
     {
-        static::saving(function (Service $service) {
-            if (blank($service->slug)) {
-                $service->slug = Str::slug($service->title);
-            }
-            if ($service->parent_id && $service->parent) {
-                $service->pillar = $service->parent->pillar;
-            }
-        });
-
-        static::saved(fn () => Cache::forget('menu.hubs'));
-        static::deleted(fn () => Cache::forget('menu.hubs'));
+        return $this->belongsToMany(self::class, 'service_related', 'service_id', 'related_service_id');
     }
 
-    public function parent(): BelongsTo
+    public function industries(): BelongsToMany
     {
-        return $this->belongsTo(self::class, 'parent_id');
+        return $this->belongsToMany(Industry::class);
     }
 
-    public function children(): HasMany
+    public function caseStudies(): BelongsToMany
     {
-        return $this->hasMany(self::class, 'parent_id');
+        return $this->belongsToMany(CaseStudy::class);
     }
 
-    public function faqs(): HasMany
+    public function posts(): BelongsToMany
     {
-        return $this->hasMany(Faq::class)->where('is_active', true)->orderBy('sort_order');
+        return $this->belongsToMany(Post::class);
     }
 
-    public function scopeHubs(Builder $query): Builder
+    public function research(): BelongsToMany
     {
-        return $query->whereNull('parent_id');
+        return $this->belongsToMany(AiResearch::class, 'ai_research_service');
     }
 
-    public function scopeActive(Builder $query): Builder
+    /** Each vertical has its own URL space so the buyer journeys stay separate. */
+    public function url(): string
     {
-        return $query->where('is_active', true);
+        return match ($this->category?->group) {
+            'technology' => route('growth-technology.show', $this->slug),
+            'talent' => route('talent.show', $this->slug),
+            default => route('services.show', $this->slug),
+        };
     }
 
-    public function isHub(): bool
+    /** Service-specific process, falling back to the engine's default delivery process. */
+    public function processSteps(): array
     {
-        return $this->parent_id === null;
-    }
-
-    public function getUrlAttribute(): string
-    {
-        return $this->isHub()
-            ? route('services.hub', $this->slug)
-            : route('services.show', [$this->parent?->slug, $this->slug]);
-    }
-
-    public function getLadderAttribute(): array
-    {
-        return config("advertally.ladder.{$this->pillar}", []);
-    }
-
-    /** The next rung on the growth ladder — used for the upsell block on every service page. */
-    public function nextHub(): ?self
-    {
-        $keys = array_keys(config('advertally.ladder'));
-        $i = array_search($this->pillar, $keys, true);
-        $next = $keys[$i + 1] ?? null;
-
-        return $next ? self::query()->hubs()->active()->where('pillar', $next)->first() : null;
+        return $this->process ?: ($this->category?->process ?? []);
     }
 }

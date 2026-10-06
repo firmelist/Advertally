@@ -3,66 +3,90 @@
 namespace App\Services;
 
 use App\Jobs\NotifyNewLead;
+use App\Models\ContactSubmission;
 use App\Models\Lead;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
+/**
+ * Single entry point for every public form: stores the raw submission, creates or enriches the lead
+ * with attribution, scores it, assigns an owner and fans out notifications.
+ */
 class LeadService
 {
-    public function __construct(private LeadScorer $scorer) {}
+    private const LEAD_FIELDS = [
+        'name', 'company', 'email', 'phone', 'website', 'job_title', 'industry', 'service_interest',
+        'challenge', 'objective', 'budget', 'message',
+    ];
 
-    /**
-     * Create a lead from validated form data + request context (attribution, device).
-     */
-    public function capture(array $data, Request $request): Lead
+    public function __construct(private Attribution $attribution) {}
+
+    public function capture(array $data, string $formType, Request $request): Lead
     {
-        $attribution = (array) $request->session()->get('attribution', []);
+        $first = $this->attribution->firstTouch($request);
+        $last = $this->attribution->lastTouch($request);
         $ua = (string) $request->userAgent();
 
         $lead = new Lead([
-            ...Arr::only($data, ['name', 'phone', 'email', 'company', 'city', 'website', 'business_size', 'industry', 'budget', 'services', 'form_type']),
-            'message' => $this->composeMessage($data),
-            'source_page' => $data['source_page'] ?? $request->headers->get('referer'),
-            'landing_page' => $attribution['landing_page'] ?? null,
-            'referrer' => $attribution['referrer'] ?? null,
-            ...Arr::only($attribution, ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid']),
+            ...Arr::only(array_filter($data, fn ($v) => filled($v)), self::LEAD_FIELDS),
+            'form_type' => $formType,
+            'source' => $last['source'] ?? $first['source'] ?? 'direct',
+            'source_page' => mb_substr((string) ($data['source_page'] ?? $request->headers->get('referer')), 0, 500) ?: null,
+            'landing_page' => $last['landing_page'] ?? $first['landing_page'] ?? null,
+            'referrer' => $last['referrer'] ?? null,
+            ...Arr::only($last, [...Attribution::UTM, ...Attribution::CLICK_IDS]),
+            'first_touch_source' => $first['source'] ?? null,
+            'first_touch_medium' => $first['utm_medium'] ?? null,
+            'first_touch_campaign' => $first['utm_campaign'] ?? null,
+            'first_touch_landing_page' => $first['landing_page'] ?? null,
+            'first_touch_at' => isset($first['at']) ? rescue(fn () => now()->parse($first['at']), null, false) : null,
+            'last_touch_source' => $last['source'] ?? null,
+            'device' => $this->device($ua),
             'ip_address' => $request->ip(),
             'user_agent' => mb_substr($ua, 0, 500),
-            'device' => $this->device($ua),
-            'pages_viewed' => (int) $request->session()->get('pages_viewed', 1),
-            'consent' => true,
+            'consent' => (bool) ($data['consent'] ?? false),
             'status' => 'new',
         ]);
 
-        $lead->score = $this->scorer->score($lead);
+        $lead->score = $this->score($lead);
         $lead->assigned_to = $this->nextAssignee()?->id;
         $lead->save();
+
+        ContactSubmission::query()->create([
+            'lead_id' => $lead->id,
+            'form' => $formType,
+            'payload' => Arr::except($data, ['consent', 'source_page']),
+            'page_url' => $lead->source_page,
+            'ip_address' => $request->ip(),
+        ]);
 
         NotifyNewLead::dispatch($lead);
 
         return $lead;
     }
 
-    /** Fold form-specific extras (hire / plan builder) into a readable message. */
-    private function composeMessage(array $data): ?string
+    /**
+     * 0–100 fit score: business email, company website, budget and intent signals.
+     * Used only to prioritise follow-up, never shown to the visitor.
+     */
+    public function score(Lead $lead): int
     {
-        $extras = array_filter([
-            'Role needed' => $data['role'] ?? null,
-            'Experience' => $data['experience'] ?? null,
-            'Engagement' => $data['engagement'] ?? null,
-            'Start date' => $data['start_date'] ?? null,
-            'Selected plan' => $data['plan_summary'] ?? null,
-            'Estimated total' => $data['plan_total'] ?? null,
-        ]);
+        $score = 10;
+        $domain = strtolower((string) str($lead->email)->after('@'));
+        $freeMail = in_array($domain, ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com', 'rediffmail.com', 'proton.me'], true);
 
-        $lines = collect($extras)->map(fn ($v, $k) => "{$k}: {$v}")->values();
+        $score += $freeMail ? 0 : 20;
+        $score += filled($lead->company) ? 10 : 0;
+        $score += filled($lead->website) ? 10 : 0;
+        $score += filled($lead->phone) ? 5 : 0;
+        $score += match ($lead->budget) {
+            '10l-plus' => 25, '3l-10l' => 20, '1l-3l' => 12, 'project' => 8, default => 0,
+        };
+        $score += in_array($lead->industry, ['technology', 'saas', 'it-services', 'consulting', 'professional-services', 'financial-services', 'recruitment', 'b2b-services'], true) ? 10 : 0;
+        $score += $lead->form_type === 'contact' ? 10 : 5;
 
-        if (filled($data['message'] ?? null)) {
-            $lines->prepend($data['message']);
-        }
-
-        return $lines->isEmpty() ? null : $lines->implode("\n");
+        return min(100, $score);
     }
 
     private function device(string $ua): string
@@ -74,17 +98,22 @@ class LeadService
         };
     }
 
-    /** Round-robin assignment across active sales users (falls back to unassigned). */
+    /** Round-robin across active users who are allowed to work leads. */
     private function nextAssignee(): ?User
     {
-        $sales = User::query()->where('role', 'sales')->where('is_active', true)->orderBy('id')->get();
-        if ($sales->isEmpty()) {
+        $owners = User::query()
+            ->where('is_active', true)
+            ->whereHas('role', fn ($q) => $q->where('name', 'growth-consultant'))
+            ->orderBy('id')
+            ->get();
+
+        if ($owners->isEmpty()) {
             return null;
         }
 
-        $lastAssigned = Lead::query()->whereIn('assigned_to', $sales->pluck('id'))->latest('id')->value('assigned_to');
-        $index = $lastAssigned ? $sales->search(fn ($u) => $u->id === $lastAssigned) : -1;
+        $last = Lead::query()->whereIn('assigned_to', $owners->pluck('id'))->latest('id')->value('assigned_to');
+        $index = $last ? $owners->search(fn ($u) => $u->id === $last) : -1;
 
-        return $sales->get(($index + 1) % $sales->count());
+        return $owners->get(($index + 1) % $owners->count());
     }
 }

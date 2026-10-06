@@ -2,43 +2,62 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Concerns\HasSeo;
+use App\Models\Concerns\LogsActivity;
+use App\Models\Concerns\Publishable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CaseStudy extends Model
 {
-    protected $guarded = ['id'];
+    use HasFactory, HasSeo, LogsActivity, Publishable;
 
-    protected function casts(): array
+    /** Story sections rendered in order on the case study page. */
+    public const SECTIONS = [
+        'challenge' => 'Business Challenge',
+        'diagnosis' => 'Growth Diagnosis',
+        'strategy' => 'Strategy',
+        'execution' => 'Execution',
+        'technology' => 'Technology',
+        'results' => 'Results',
+        'business_impact' => 'Business Impact',
+    ];
+
+    protected $fillable = [
+        'industry_id', 'testimonial_id', 'client_name', 'is_sample', 'title', 'slug', 'summary', 'challenge', 'diagnosis',
+        'strategy', 'execution', 'technology', 'results', 'business_impact', 'chart', 'featured_image', 'gallery',
+        'is_featured', 'status', 'published_at',
+    ];
+
+    protected $casts = [
+        'is_sample' => 'boolean', 'is_featured' => 'boolean', 'chart' => 'array', 'gallery' => 'array', 'published_at' => 'datetime',
+    ];
+
+    public function industry(): BelongsTo
     {
-        return [
-            'services' => 'array',
-            'results' => 'array',
-            'is_featured' => 'boolean',
-            'is_published' => 'boolean',
-        ];
+        return $this->belongsTo(Industry::class);
     }
 
-    protected static function booted(): void
+    public function testimonial(): BelongsTo
     {
-        static::saving(function (CaseStudy $cs) {
-            $cs->slug = $cs->slug ?: Str::slug($cs->title);
-        });
+        return $this->belongsTo(Testimonial::class);
     }
 
-    public function scopePublished(Builder $query): Builder
+    public function metrics(): HasMany
     {
-        return $query->where('is_published', true)->orderBy('sort_order');
+        return $this->hasMany(CaseStudyMetric::class)->orderBy('sort_order');
     }
 
-    public function getRouteKeyName(): string
+    public function services(): BelongsToMany
     {
-        return 'slug';
+        return $this->belongsToMany(Service::class);
     }
 
-    public function getIndustryLabelAttribute(): ?string
+    public function url(): string
     {
-        return config('advertally.industries')[$this->industry] ?? $this->industry;
+        return route('case-studies.show', $this->slug);
     }
 }

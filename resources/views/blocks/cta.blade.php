@@ -1,0 +1,1 @@
+<x-cta-band :title="$data['title'] ?? 'Know exactly where your growth is leaking.'" :text="$data['text'] ?? 'The Advertally Growth Score™ benchmarks your business across six growth engines in about four minutes.'" />

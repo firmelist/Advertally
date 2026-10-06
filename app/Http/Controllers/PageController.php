@@ -2,68 +2,51 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AiResearch;
 use App\Models\CaseStudy;
-use App\Models\ClientLogo;
-use App\Models\Faq;
-use App\Models\PlanBuilderItem;
-use App\Models\PricingPlan;
-use App\Models\Service;
-use App\Models\Testimonial;
-use Illuminate\Contracts\View\View;
+use App\Models\Page;
+use App\Models\Post;
+use App\Services\Seo;
+use Illuminate\View\View;
 
 class PageController extends Controller
 {
+    public function __construct(private Seo $seo) {}
+
     public function home(): View
     {
-        $data = [
-            'hubs' => Service::hubs()->active()->with(['children' => fn ($q) => $q->active()->orderBy('sort_order')])->orderBy('sort_order')->get(),
-            'caseStudies' => CaseStudy::published()->where('is_featured', true)->take(3)->get(),
-            'testimonials' => Testimonial::active()->take(6)->get(),
-            'plans' => PricingPlan::active()->where('category', 'marketing')->take(3)->get(),
-            'faqs' => Faq::forPage('home')->get(),
-            'logos' => ClientLogo::where('is_active', true)->orderBy('sort_order')->get(),
-        ];
+        $page = Page::query()->published()->where('slug', 'home')->with('seo')->firstOrFail();
 
-        return view('pages.home', $data);
+        $this->seo->page(
+            'Advertally — AI-Native Growth & Revenue Partner',
+            'Advertally builds AI-ready growth systems that help businesses get discovered, trusted and chosen across search, AI platforms and every digital touchpoint that drives revenue.',
+            $page,
+        );
+
+        return view('pages.blocks', ['page' => $page, 'isHome' => true]);
     }
 
-    public function about(): View
+    public function show(string $slug): View
     {
-        return view('pages.about', [
-            'testimonials' => Testimonial::active()->take(3)->get(),
+        $page = Page::query()->published()->where('slug', $slug)->with('seo')->firstOrFail();
+
+        $this->seo->page($page->title, data_get($page->blocks, '0.data.subheadline') ?? strip_tags((string) $page->body), $page)
+            ->breadcrumbs([$page->title => null]);
+
+        return view($page->template === 'legal' ? 'pages.legal' : 'pages.blocks', ['page' => $page]);
+    }
+
+    public function resources(): View
+    {
+        $this->seo->page('Resources: Growth Intelligence for the AI Era',
+            'Insights, AI Search Lab research, growth stories, reports and free diagnostic tools from Advertally.')
+            ->breadcrumbs(['Resources' => null]);
+
+        return view('pages.resources', [
+            'posts' => Post::query()->published()->with('category', 'author')->latest('published_at')->take(3)->get(),
+            'research' => AiResearch::query()->published()->latest('published_at')->take(3)->get(),
+            'caseStudies' => CaseStudy::query()->published()->with('industry')->latest('published_at')->take(2)->get(),
+            'reports' => Post::query()->published()->whereIn('type', ['report', 'framework'])->latest('published_at')->take(3)->get(),
         ]);
-    }
-
-    public function contact(): View
-    {
-        return view('pages.contact', ['faqs' => Faq::forPage('contact')->get()]);
-    }
-
-    public function consultation(): View
-    {
-        return view('pages.consultation');
-    }
-
-    public function pricing(): View
-    {
-        return view('pages.pricing', [
-            'plans' => PricingPlan::active()->get()->groupBy('category'),
-            'builderItems' => PlanBuilderItem::where('is_active', true)->orderBy('sort_order')->get()
-                ->map(fn ($i) => ['key' => 'i'.$i->id, 'label' => $i->label, 'group' => $i->group, 'price' => $i->price, 'unit' => $i->unit])
-                ->values(),
-            'faqs' => Faq::forPage('pricing')->get(),
-        ]);
-    }
-
-    public function thankYou(): View
-    {
-        return view('pages.thank-you', ['lead' => session('lead_name')]);
-    }
-
-    public function legal(string $page): View
-    {
-        abort_unless(in_array($page, ['privacy', 'terms', 'refund'], true), 404);
-
-        return view("pages.legal.{$page}");
     }
 }

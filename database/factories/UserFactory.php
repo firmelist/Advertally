@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -18,7 +19,6 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'role' => 'sales',
             'is_active' => true,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -26,18 +26,9 @@ class UserFactory extends Factory
         ];
     }
 
-    public function admin(): static
+    /** Assign a seeded role by name (super-admin, content-editor, growth-consultant, analyst). */
+    public function role(string $name): static
     {
-        return $this->state(fn () => ['role' => 'admin']);
-    }
-
-    public function editor(): static
-    {
-        return $this->state(fn () => ['role' => 'editor']);
-    }
-
-    public function sales(): static
-    {
-        return $this->state(fn () => ['role' => 'sales']);
+        return $this->state(fn () => ['role_id' => Role::query()->where('name', $name)->value('id')]);
     }
 }

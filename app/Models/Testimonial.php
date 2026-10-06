@@ -2,25 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class Testimonial extends Model
 {
-    protected $guarded = ['id'];
+    use LogsActivity;
 
-    protected function casts(): array
-    {
-        return ['is_active' => 'boolean'];
-    }
+    protected $fillable = ['name', 'role', 'company', 'quote', 'photo', 'is_published', 'sort_order'];
 
-    public function scopeActive(Builder $query): Builder
-    {
-        return $query->where('is_active', true)->orderBy('sort_order');
-    }
-
-    public function getInitialsAttribute(): string
-    {
-        return collect(explode(' ', $this->name))->map(fn ($p) => mb_substr($p, 0, 1))->take(2)->implode('');
-    }
+    protected $casts = ['is_published' => 'boolean'];
 }

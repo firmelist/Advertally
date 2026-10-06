@@ -1,20 +1,28 @@
 @props([
-    'title' => 'Ready to grow with one trusted digital partner?',
-    'subtitle' => 'Get a free audit of your website and marketing, plus a practical 90-day growth plan. No obligation.',
-    'context' => null,
+    'title' => 'Know exactly where your growth is leaking.',
+    'text' => 'The Advertally Growth Score™ benchmarks your business across AI Visibility, Search Visibility, Authority, Demand, Conversion and Intelligence — in about four minutes.',
 ])
-<section class="px-4 py-16 sm:px-6 lg:px-8">
-    <div class="bg-navy-glow relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] px-6 py-14 sm:px-12 lg:py-16">
-        <div class="bg-grid pointer-events-none absolute inset-0 opacity-30 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]"></div>
-        <div class="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-            <div class="max-w-2xl">
-                <h2 class="text-3xl leading-tight font-extrabold text-white sm:text-4xl">{{ $title }}</h2>
-                <p class="mt-4 text-lg text-white/75">{{ $subtitle }}</p>
+<section class="section-tight" aria-label="Get your Growth Score">
+    <div class="container-x">
+        <div class="bg-navy-field relative overflow-hidden rounded-[2rem] px-6 py-12 sm:px-12 sm:py-16 lg:px-16" data-reveal>
+            <div class="bg-dots-dark absolute inset-0 opacity-60" aria-hidden="true"></div>
+            <div class="relative grid items-center gap-10 lg:grid-cols-[1.3fr_1fr]">
+                <div>
+                    <p class="eyebrow-dark">Advertally Growth Score™</p>
+                    <h2 class="h-section mt-3 !text-white">{{ $title }}</h2>
+                    <p class="mt-4 max-w-xl text-lg leading-relaxed text-navy-200">{{ $text }}</p>
+                    <x-cta-buttons class="mt-8" dark />
+                </div>
+                <div class="hidden justify-end gap-4 sm:flex" aria-hidden="true">
+                    @foreach ([['AI', 64], ['Search', 78], ['Demand', 52]] as [$label, $score])
+                        <div class="card-dark flex flex-col items-center p-4">
+                            <x-score-ring :score="$score" size="sm" dark />
+                            <span class="mt-2 text-[11px] font-semibold text-navy-200">{{ $label }}</span>
+                        </div>
+                    @endforeach
+                </div>
             </div>
-            <div class="flex shrink-0 flex-col gap-3 sm:flex-row">
-                <a href="{{ route('audit.create') }}" class="btn-cta">Get Free Audit <x-lucide name="arrow-right" class="size-4" /></a>
-                <a href="{{ whatsapp_link($context) }}" target="_blank" rel="noopener" class="btn-on-dark"><x-whatsapp-glyph class="size-5" /> WhatsApp Us</a>
-            </div>
+            <p class="relative mt-8 text-[11px] text-navy-300 sm:text-right">Scores shown are illustrative.</p>
         </div>
     </div>
 </section>

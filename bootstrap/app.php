@@ -13,8 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Cookies written by JavaScript (consent, exit-intent) are plain text.
-        $middleware->encryptCookies(except: ['adv_consent', 'adv_exit']);
+        // The consent cookie is written by JavaScript, so it stays plain text.
+        $middleware->encryptCookies(except: ['adv_consent']);
+
+        // Hostinger and most shared hosts terminate TLS at a proxy.
+        $middleware->trustProxies(at: '*');
 
         $middleware->web(append: [
             CaptureAttribution::class,

@@ -2,137 +2,90 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Lead extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
+    public const STATUSES = [
+        'new' => 'New',
+        'contacted' => 'Contacted',
+        'qualified' => 'Qualified',
+        'opportunity' => 'Opportunity',
+        'won' => 'Customer',
+        'lost' => 'Lost',
+        'spam' => 'Spam',
+    ];
+
+    /** Statuses that count as "qualified" for dashboard conversion metrics. */
+    public const QUALIFIED = ['qualified', 'opportunity', 'won'];
 
     public const FORM_TYPES = [
-        'contact' => 'Contact form',
-        'quote' => 'Quote request',
-        'audit' => 'Free website audit',
-        'hire' => 'Hire resources',
-        'plan_builder' => 'Pricing calculator',
-        'popup' => 'Exit-intent popup',
-        'consultation' => 'Book consultation',
+        'contact' => 'Strategy request',
+        'growth_score' => 'Growth Score',
+        'ai_audit' => 'AI Visibility Audit',
+        'talent' => 'Technology & Talent',
     ];
 
-    /** Service interests shown on forms, grouped by ladder pillar. */
-    public const SERVICE_OPTIONS = [
-        'seo' => 'SEO',
-        'google_ads' => 'Google Ads',
-        'meta_ads' => 'Facebook / Instagram Ads',
-        'social_media' => 'Social Media',
-        'whatsapp_marketing' => 'WhatsApp Marketing',
-        'website' => 'Website / E-commerce',
-        'hire' => 'Hire Developer / Marketer',
-        'crm' => 'CRM & Automation',
-        'custom_software' => 'Custom Software / App',
+    protected $fillable = [
+        'name', 'company', 'email', 'phone', 'website', 'job_title', 'industry', 'service_interest', 'challenge',
+        'objective', 'budget', 'message', 'form_type', 'source', 'landing_page', 'source_page', 'referrer',
+        'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+        'first_touch_source', 'first_touch_medium', 'first_touch_campaign', 'first_touch_landing_page', 'first_touch_at',
+        'last_touch_source', 'gclid', 'fbclid', 'li_fat_id', 'device', 'ip_address', 'user_agent',
+        'status', 'score', 'assigned_to', 'estimated_value', 'next_follow_up_at', 'notes', 'consent',
     ];
 
-    public const SERVICE_PILLAR = [
-        'seo' => 'grow', 'google_ads' => 'grow', 'meta_ads' => 'grow', 'social_media' => 'grow', 'whatsapp_marketing' => 'grow',
-        'website' => 'build', 'hire' => 'scale', 'crm' => 'automate', 'custom_software' => 'transform',
+    protected $casts = [
+        'first_touch_at' => 'datetime',
+        'next_follow_up_at' => 'datetime',
+        'consent' => 'boolean',
     ];
-
-    protected $guarded = ['id'];
-
-    protected function casts(): array
-    {
-        return [
-            'services' => 'array',
-            'consent' => 'boolean',
-            'next_follow_up_at' => 'datetime',
-            'contacted_at' => 'datetime',
-        ];
-    }
-
-    protected static function booted(): void
-    {
-        static::updating(function (Lead $lead) {
-            if ($lead->isDirty('status') && $lead->status !== 'new' && ! $lead->contacted_at) {
-                $lead->contacted_at = now();
-            }
-        });
-
-        // Every status change is written to the activity timeline.
-        static::updated(function (Lead $lead) {
-            if ($lead->wasChanged('status')) {
-                $labels = config('advertally.lead_statuses');
-                $lead->notes()->create([
-                    'user_id' => auth()->id(),
-                    'type' => 'status',
-                    'body' => 'Status changed from '.($labels[$lead->getOriginal('status')] ?? $lead->getOriginal('status'))
-                        .' to '.($labels[$lead->status] ?? $lead->status).'.',
-                ]);
-            }
-        });
-    }
 
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
 
-    public function notes(): HasMany
+    public function activities(): HasMany
     {
-        return $this->hasMany(LeadNote::class)->latest();
+        return $this->hasMany(LeadActivity::class)->latest();
     }
 
-    public function auditReport(): HasOne
+    public function submissions(): HasMany
     {
-        return $this->hasOne(AuditReport::class);
+        return $this->hasMany(ContactSubmission::class);
     }
 
-    public function client(): HasOne
+    public function audits(): HasMany
     {
-        return $this->hasOne(Client::class);
+        return $this->hasMany(AuditRequest::class);
     }
 
-    /** Sales executives only see leads assigned to them. */
-    public function scopeVisibleTo(Builder $query, ?User $user): Builder
+    public function scopeQualified(Builder $query): Builder
     {
-        if ($user && $user->isSales()) {
-            $query->where('assigned_to', $user->id);
-        }
-
-        return $query;
+        return $query->whereIn('status', self::QUALIFIED);
     }
 
-    public function getStatusLabelAttribute(): string
+    public function label(string $field): ?string
     {
-        return config('advertally.lead_statuses')[$this->status] ?? ucfirst((string) $this->status);
-    }
+        $value = $this->{$field};
 
-    public function getServicesLabelAttribute(): string
-    {
-        return collect($this->services ?? [])
-            ->map(fn ($s) => self::SERVICE_OPTIONS[$s] ?? $s)
-            ->implode(', ');
-    }
-
-    public function getWhatsappUrlAttribute(): string
-    {
-        $phone = preg_replace('/\D/', '', (string) $this->phone);
-        if (strlen($phone) === 10) {
-            $phone = '91'.$phone;
-        }
-
-        return 'https://wa.me/'.$phone.'?text='.rawurlencode("Hi {$this->name}, this is Advertally. Thanks for your enquiry!");
-    }
-
-    public function getTemperatureAttribute(): string
-    {
-        return match (true) {
-            $this->score >= 60 => 'hot',
-            $this->score >= 35 => 'warm',
-            default => 'cold',
+        return match ($field) {
+            'industry' => config("advertally.industries.{$value}", $value),
+            'service_interest' => config("advertally.service_interests.{$value}", $value),
+            'challenge' => config("advertally.challenges.{$value}", $value),
+            'objective' => config("advertally.objectives.{$value}", $value),
+            'budget' => config("advertally.budgets.{$value}", $value),
+            'form_type' => self::FORM_TYPES[$value] ?? $value,
+            'status' => self::STATUSES[$value] ?? $value,
+            default => $value,
         };
     }
 }

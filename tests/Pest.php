@@ -10,19 +10,20 @@ pest()->extend(Tests\TestCase::class)
     })
     ->in('Feature');
 
-/** Build a valid lead payload for the public forms. */
-function leadPayload(array $overrides = []): array
+/** A valid strategy-request payload for the contact form. */
+function contactPayload(array $overrides = []): array
 {
     return array_merge([
-        'name' => 'Rahul Mehta',
-        'phone' => '+91 98100 12345',
-        'email' => 'rahul@example.com',
-        'company' => 'Mehta Industries',
-        'business_size' => 'small',
-        'budget' => '25k_60k',
-        'services' => ['seo', 'website'],
-        'form_type' => 'quote',
-        'form_id' => 'test',
+        'form' => 'contact',
+        'name' => 'Priya Nair',
+        'company' => 'Nair Analytics',
+        'email' => 'priya@nairanalytics.in',
+        'website' => 'nairanalytics.in',
+        'industry' => 'saas',
+        'challenge' => 'not-visible',
+        'objective' => 'pipeline',
+        'budget' => '3l-10l',
+        'message' => 'We want to appear in AI answers for our category.',
         'consent' => '1',
         '_ts' => time() - 30,
     ], $overrides);

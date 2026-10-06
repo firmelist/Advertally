@@ -2,49 +2,35 @@
 
 namespace App\Filament\Widgets;
 
-use App\Filament\Resources\LeadResource;
+use App\Models\Lead;
 use Filament\Widgets\ChartWidget;
 
 class LeadsTrendChart extends ChartWidget
 {
-    protected static ?string $heading = 'Leads — last 30 days';
+    protected static ?string $heading = 'Leads vs qualified — last 30 days';
 
     protected static ?int $sort = 2;
 
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?string $maxHeight = '260px';
 
     public static function canView(): bool
     {
-        return in_array(auth()->user()?->role, ['admin', 'sales'], true);
+        return auth()->user()?->hasPermission('leads.view') ?? false;
     }
 
     protected function getData(): array
     {
-        $rows = LeadResource::getEloquentQuery()
-            ->where('created_at', '>=', today()->subDays(29))
-            ->get(['created_at', 'score'])
-            ->groupBy(fn ($l) => $l->created_at->toDateString());
+        $days = collect(range(29, 0))->map(fn ($d) => now()->subDays($d)->startOfDay());
 
-        $days = collect(range(29, 0))->map(fn ($d) => today()->subDays($d));
+        $all = Lead::query()->where('created_at', '>=', $days->first())->get(['created_at', 'status'])
+            ->groupBy(fn ($l) => $l->created_at->toDateString());
 
         return [
             'datasets' => [
-                [
-                    'label' => 'All leads',
-                    'data' => $days->map(fn ($d) => $rows->get($d->toDateString())?->count() ?? 0)->all(),
-                    'borderColor' => '#2952CC',
-                    'backgroundColor' => 'rgba(41, 82, 204, 0.12)',
-                    'fill' => true,
-                    'tension' => 0.35,
-                ],
-                [
-                    'label' => 'Hot (60+)',
-                    'data' => $days->map(fn ($d) => $rows->get($d->toDateString())?->where('score', '>=', 60)->count() ?? 0)->all(),
-                    'borderColor' => '#F26B1D',
-                    'backgroundColor' => 'transparent',
-                    'tension' => 0.35,
-                ],
+                ['label' => 'Leads', 'data' => $days->map(fn ($d) => $all->get($d->toDateString())?->count() ?? 0)->all(), 'borderColor' => '#2563EB', 'backgroundColor' => 'rgba(37,99,235,.1)', 'fill' => true, 'tension' => .3],
+                ['label' => 'Qualified', 'data' => $days->map(fn ($d) => $all->get($d->toDateString())?->whereIn('status', Lead::QUALIFIED)->count() ?? 0)->all(), 'borderColor' => '#16A34A', 'tension' => .3],
             ],
             'labels' => $days->map(fn ($d) => $d->format('d M'))->all(),
         ];

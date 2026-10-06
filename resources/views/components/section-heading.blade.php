@@ -1,10 +1,11 @@
-@props(['eyebrow' => null, 'title', 'subtitle' => null, 'align' => 'center', 'dark' => false])
-<div {{ $attributes->class(['max-w-3xl', 'mx-auto text-center' => $align === 'center']) }}>
+@props(['eyebrow' => null, 'title', 'intro' => null, 'align' => 'left', 'dark' => false, 'as' => 'h2'])
+<div {{ $attributes->merge(['class' => ($align === 'center' ? 'mx-auto max-w-3xl text-center' : 'max-w-3xl')]) }} data-reveal>
     @if ($eyebrow)
-        <span @class(['eyebrow', '!bg-white/10 !text-accent-300' => $dark])>{{ $eyebrow }}</span>
+        <p class="{{ $dark ? 'eyebrow-dark' : 'eyebrow' }}">{{ $eyebrow }}</p>
     @endif
-    <h2 @class(['h-section mt-4', '!text-white' => $dark])>{!! $title !!}</h2>
-    @if ($subtitle)
-        <p @class(['lead-text mt-4', '!text-white/70' => $dark])>{{ $subtitle }}</p>
+    <{{ $as }} class="h-section mt-3 {{ $dark ? '!text-white' : '' }}">{!! $title !!}</{{ $as }}>
+    @if ($intro)
+        <p class="mt-5 text-lg leading-relaxed {{ $dark ? 'text-navy-200' : 'text-muted' }}">{!! $intro !!}</p>
     @endif
+    {{ $slot }}
 </div>

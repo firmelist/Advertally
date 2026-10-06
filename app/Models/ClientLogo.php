@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class ClientLogo extends Model
 {
-    protected $guarded = ['id'];
+    use LogsActivity;
 
-    protected function casts(): array
-    {
-        return ['is_active' => 'boolean'];
-    }
+    protected $fillable = ['name', 'logo', 'url', 'is_active', 'sort_order'];
+
+    protected $casts = ['is_active' => 'boolean'];
 }

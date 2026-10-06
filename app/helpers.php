@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Setting;
+use Illuminate\Support\Facades\Storage;
 
 if (! function_exists('setting')) {
     /**
@@ -12,47 +13,31 @@ if (! function_exists('setting')) {
     }
 }
 
-if (! function_exists('inr')) {
+if (! function_exists('media_url')) {
     /**
-     * Format a number in Indian currency style: ₹1,25,000
+     * Public URL for an uploaded file path (or pass through absolute URLs).
      */
-    function inr(int|float|null $amount, bool $symbol = true): string
+    function media_url(?string $path): ?string
     {
-        if ($amount === null) {
-            return '';
+        if (blank($path)) {
+            return null;
         }
 
-        $amount = (int) round($amount);
-        $negative = $amount < 0;
-        $num = (string) abs($amount);
-
-        if (strlen($num) > 3) {
-            $last3 = substr($num, -3);
-            $rest = substr($num, 0, -3);
-            $rest = preg_replace('/\B(?=(\d{2})+(?!\d))/', ',', $rest);
-            $num = $rest.','.$last3;
-        }
-
-        return ($negative ? '-' : '').($symbol ? '₹' : '').$num;
+        return preg_match('#^(https?:)?//#', $path) ? $path : Storage::disk('public')->url($path);
     }
 }
 
-if (! function_exists('whatsapp_link')) {
+if (! function_exists('score_tone')) {
     /**
-     * Click-to-chat link with a pre-filled message that includes the page name.
+     * Semantic tone for a 0–100 score. Green is reserved for genuinely strong outcomes.
      */
-    function whatsapp_link(?string $context = null): string
+    function score_tone(?int $score): string
     {
-        $number = preg_replace('/\D/', '', (string) setting('whatsapp_number', '919999999999'));
-        $text = 'Hi Advertally, I would like to know more'.($context ? " about {$context}" : '').'.';
-
-        return 'https://wa.me/'.$number.'?text='.rawurlencode($text);
-    }
-}
-
-if (! function_exists('tel_link')) {
-    function tel_link(): string
-    {
-        return 'tel:'.preg_replace('/[^\d+]/', '', (string) setting('phone', '+91 99999 99999'));
+        return match (true) {
+            $score === null => 'muted',
+            $score >= 75 => 'strong',
+            $score >= 50 => 'fair',
+            default => 'weak',
+        };
     }
 }

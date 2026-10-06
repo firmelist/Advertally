@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
@@ -9,7 +10,11 @@ use Throwable;
 
 class Setting extends Model
 {
-    protected $fillable = ['group', 'key', 'label', 'value', 'type'];
+    use LogsActivity;
+
+    public const GROUPS = ['general' => 'Company', 'contact' => 'Contact', 'social' => 'Social profiles', 'seo' => 'SEO defaults'];
+
+    protected $fillable = ['group', 'key', 'label', 'type', 'value'];
 
     protected static function booted(): void
     {
@@ -17,23 +22,16 @@ class Setting extends Model
         static::deleted(fn () => Cache::forget('settings.all'));
     }
 
-    public static function allCached(): array
-    {
-        try {
-            return Cache::rememberForever('settings.all', function () {
-                return Schema::hasTable('settings')
-                    ? static::query()->pluck('value', 'key')->all()
-                    : [];
-            });
-        } catch (Throwable) {
-            return [];
-        }
-    }
-
     public static function get(string $key, mixed $default = null): mixed
     {
-        $value = static::allCached()[$key] ?? null;
+        try {
+            $all = Cache::rememberForever('settings.all', fn () => Schema::hasTable('settings')
+                ? static::query()->pluck('value', 'key')->all()
+                : []);
+        } catch (Throwable) {
+            return $default;
+        }
 
-        return ($value === null || $value === '') ? $default : $value;
+        return filled($all[$key] ?? null) ? $all[$key] : $default;
     }
 }
