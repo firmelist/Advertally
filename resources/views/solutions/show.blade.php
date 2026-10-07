@@ -4,6 +4,7 @@
     $isTalent = $category->group === 'talent';
     $flow = array_values(array_filter((array) $category->flow));
     $metrics = array_values(array_filter((array) $category->metrics));
+    $orbit = \App\Support\Orbit::forCategory($category);
 @endphp
 
 @section('content')
@@ -28,11 +29,32 @@
                     @if ($isTalent)
                         <x-cta-buttons class="mt-9" :primary-label="$category->cta_label ?: 'Discuss your requirement'" primary-url="#enquire" secondary-label="See how we work" :secondary-url="url('approach')" />
                     @else
-                        <x-cta-buttons class="mt-9" :primary-label="$category->cta_label ?: 'Get Your Growth Score'" :primary-url="$category->cta_url ? url($category->cta_url) : null" />
+                        @php $expertFirst = $category->cta_label === 'Talk to an Expert'; @endphp
+                        <x-cta-buttons class="mt-9" :primary-label="$category->cta_label ?: 'Get Your Growth Score'" :primary-url="$category->cta_url ? url($category->cta_url) : null"
+                            :secondary-label="$expertFirst ? 'Get Your Growth Score' : 'Talk to an Expert'" :secondary-url="$expertFirst ? route('growth-score') : null" />
                     @endif
                 </div>
 
-                {{-- visual --}}
+                {{-- animated orbit visual --}}
+                <x-orbit :center="$orbit['center']" :nodes="$orbit['nodes']" />
+            </div>
+        </div>
+    </section>
+
+    {{-- PRINCIPLE --}}
+    @if ($category->principle)
+        <section class="border-y border-line bg-white">
+            <div class="container-x py-10 sm:py-12">
+                <p class="mx-auto max-w-4xl text-center text-xl leading-snug font-bold text-ink sm:text-2xl" data-reveal>“{{ $category->principle }}”</p>
+            </div>
+        </section>
+    @endif
+
+    {{-- INTRO + FLOW / METRICS + HIGHLIGHTS --}}
+    <section class="section bg-white">
+        <div class="container-x grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
+            <div class="prose-adv lg:sticky lg:top-28 lg:self-start" data-reveal>{!! str($category->intro)->sanitizeHtml() !!}</div>
+            <div class="space-y-4">
                 <div data-reveal>
                     @if ($flow)
                         <div class="card overflow-hidden">
@@ -71,24 +93,6 @@
                         <div class="card p-8"><x-signal /></div>
                     @endif
                 </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- PRINCIPLE --}}
-    @if ($category->principle)
-        <section class="border-y border-line bg-white">
-            <div class="container-x py-10 sm:py-12">
-                <p class="mx-auto max-w-4xl text-center text-xl leading-snug font-bold text-ink sm:text-2xl" data-reveal>“{{ $category->principle }}”</p>
-            </div>
-        </section>
-    @endif
-
-    {{-- INTRO + HIGHLIGHTS --}}
-    @if ($category->intro || $category->highlights)
-        <section class="section bg-white">
-            <div @class(['grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-20 container-x' => $category->highlights, 'container-narrow' => ! $category->highlights])>
-                <div class="prose-adv lg:sticky lg:top-28 lg:self-start" data-reveal>{!! str($category->intro)->sanitizeHtml() !!}</div>
                 @if ($category->highlights)
                     <div class="grid gap-4 sm:grid-cols-2">
                         @foreach ($category->highlights as $h)
@@ -100,8 +104,8 @@
                     </div>
                 @endif
             </div>
-        </section>
-    @endif
+        </div>
+    </section>
 
     {{-- SERVICES --}}
     @if ($category->services->isNotEmpty())

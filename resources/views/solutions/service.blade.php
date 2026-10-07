@@ -3,6 +3,7 @@
 @php
     $isTalent = $category->group === 'talent';
     $steps = $service->processSteps();
+    $orbit = \App\Support\Orbit::forService($service);
 @endphp
 
 @section('content')
@@ -10,7 +11,7 @@
     <section class="bg-hero relative overflow-hidden pt-10 pb-16 sm:pt-14 lg:pb-20">
         <div class="container-x relative">
             <x-breadcrumbs class="mb-10" />
-            <div class="grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
+            <div class="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
                 <div>
                     <a href="{{ $category->url() }}" class="eyebrow hover:text-brand-800">
                         @if ($category->number)<span class="font-mono">{{ $category->number }}</span> — @endif{{ $category->name }}@if ($category->tagline) · {{ $category->tagline }}@endif
@@ -23,16 +24,7 @@
                         <x-cta-buttons class="mt-9" />
                     @endif
                 </div>
-                @if ($service->deliverables)
-                    <aside class="card self-start p-6 sm:p-8" aria-labelledby="included-title" data-reveal>
-                        <p id="included-title" class="text-sm font-bold text-ink">{{ $isTalent ? 'What you get' : 'What is included' }}</p>
-                        <ul class="mt-5 space-y-3">
-                            @foreach ($service->deliverables as $item)
-                                <li class="flex gap-3 text-[15px] text-body"><x-glyph name="check" class="mt-0.5 size-5 text-brand-600" /> {{ $item }}</li>
-                            @endforeach
-                        </ul>
-                    </aside>
-                @endif
+                <x-orbit :center="$orbit['center']" :nodes="$orbit['nodes']" class="self-center" />
             </div>
         </div>
     </section>
@@ -41,9 +33,19 @@
     <section class="section bg-white">
         <div class="container-x grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:gap-20">
             <div class="prose-adv" data-reveal>{!! str($service->long_description)->sanitizeHtml() !!}</div>
-            @if ($service->benefits)
-                <div class="space-y-4">
-                    <p class="eyebrow">Business outcomes</p>
+            <div class="space-y-4">
+                @if ($service->deliverables)
+                    <aside class="card p-6 sm:p-8" aria-labelledby="included-title" data-reveal>
+                        <p id="included-title" class="text-sm font-bold text-ink">{{ $isTalent ? 'What you get' : 'What is included' }}</p>
+                        <ul class="mt-5 space-y-3">
+                            @foreach ($service->deliverables as $item)
+                                <li class="flex gap-3 text-[15px] text-body"><x-glyph name="check" class="mt-0.5 size-5 text-brand-600" /> {{ $item }}</li>
+                            @endforeach
+                        </ul>
+                    </aside>
+                @endif
+                @if ($service->benefits)
+                    <p class="eyebrow pt-4">Business outcomes</p>
                     @foreach ($service->benefits as $benefit)
                         <div class="card flex gap-4 p-6" data-reveal>
                             <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700"><x-glyph name="target" /></span>
@@ -53,8 +55,8 @@
                             </div>
                         </div>
                     @endforeach
-                </div>
-            @endif
+                @endif
+            </div>
         </div>
     </section>
 

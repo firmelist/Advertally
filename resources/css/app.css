@@ -171,4 +171,38 @@
     .js [data-reveal].is-visible { opacity: 1; transform: none; }
 
     .signal-line { stroke-dasharray: 6 10; animation: var(--animate-signal); }
+
+    /* ---------- Orbit hero visual (engine & service pages) ---------- */
+    .orbit-panel {
+        background:
+            radial-gradient(60% 50% at 50% 50%, rgb(99 102 241 / 0.28), transparent 70%),
+            radial-gradient(40% 40% at 100% 100%, rgb(6 182 212 / 0.16), transparent 70%),
+            radial-gradient(45% 45% at 0% 0%, rgb(124 58 237 / 0.22), transparent 70%),
+            #071528;
+    }
+    .orbit-grid {
+        background-image: linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+            linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+        background-size: 44px 44px;
+    }
+    .orbit-ring { animation: orbit-spin 60s linear infinite; transform-origin: 50% 50%; }
+    .orbit-core { animation: orbit-glow 4s ease-in-out infinite; }
+    .orbit-card { animation: orbit-float 7s ease-in-out infinite; }
+    .orbit-card:nth-child(2) { animation-delay: -1.8s; }
+    .orbit-card:nth-child(3) { animation-delay: -3.6s; }
+    .orbit-card:nth-child(4) { animation-delay: -5.4s; }
+    .orbit-bar { transform-origin: bottom; animation: orbit-bar 3.2s ease-in-out infinite; }
+    .orbit-caret { animation: orbit-caret 1s steps(1) infinite; }
+    .orbit-type { display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: bottom; animation: orbit-type 6s steps(28) infinite; }
+    .orbit-chip { animation: orbit-chip 4.5s ease-in-out infinite; }
+    .orbit-check { animation: orbit-check 4s ease-in-out infinite; }
+
+    @keyframes orbit-spin { to { transform: rotate(360deg); } }
+    @keyframes orbit-glow { 0%, 100% { box-shadow: 0 0 40px 4px rgb(99 102 241 / 0.35); } 50% { box-shadow: 0 0 70px 14px rgb(124 58 237 / 0.45); } }
+    @keyframes orbit-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes orbit-bar { 0%, 100% { transform: scaleY(0.55); } 50% { transform: scaleY(1); } }
+    @keyframes orbit-caret { 50% { opacity: 0; } }
+    @keyframes orbit-type { 0% { max-width: 0; } 45%, 85% { max-width: 100%; } 100% { max-width: 0; } }
+    @keyframes orbit-chip { 0%, 30%, 100% { background: rgb(255 255 255 / 0.06); color: rgb(195 206 222); } 10%, 20% { background: rgb(124 58 237 / 0.45); color: #fff; } }
+    @keyframes orbit-check { 0%, 15% { opacity: 0.25; transform: scale(0.6); } 30%, 100% { opacity: 1; transform: none; } }
 }

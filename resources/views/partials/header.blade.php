@@ -1,4 +1,4 @@
-﻿<header x-data="megaMenu"
+<header x-data="megaMenu"
     x-init="scrolled = window.scrollY > 8"
     @scroll.window.passive="scrolled = window.scrollY > 8"
     @keydown.escape.window="close(); drawer = false"
