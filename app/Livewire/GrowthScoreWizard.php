@@ -41,7 +41,7 @@ class GrowthScoreWizard extends Component
 
     public bool $consent = false;
 
-    public string $company_url = ''; // honeypot
+    public string $hp_trap = ''; // honeypot
 
     public function mount(): void
     {
@@ -98,7 +98,7 @@ class GrowthScoreWizard extends Component
             'consent' => ['accepted'],
         ], ['consent.accepted' => 'Please agree so we can send your report and follow up.']);
 
-        if ($this->company_url !== '') {
+        if ($this->hp_trap !== '') {
             $this->addError('email', 'Something went wrong. Please try again.');
 
             return null;

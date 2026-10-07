@@ -46,7 +46,7 @@
                 <p class="mt-2 text-sm text-muted">Your report opens instantly. A strategist may follow up with one or two observations — never a hard sell.</p>
 
                 <div class="relative mt-6 grid gap-5 sm:grid-cols-2">
-                    <div class="absolute -left-[10000px]" aria-hidden="true"><input type="text" wire:model="company_url" tabindex="-1" autocomplete="off"></div>
+                    <div class="absolute -left-[10000px]" aria-hidden="true"><input type="text" wire:model="hp_trap" tabindex="-1" autocomplete="off" data-lpignore="true" data-1p-ignore aria-label="Leave this field empty"></div>
                     @foreach ([['name', 'Your name', 'text', 'name'], ['email', 'Business email', 'email', 'email'], ['company', 'Company', 'text', 'organization'], ['website', 'Website', 'text', 'url']] as [$field, $label, $type, $auto])
                         <div>
                             <label for="gs-{{ $field }}" class="field-label">{{ $label }} @if ($field !== 'website')<span class="text-red-700" aria-hidden="true">*</span>@endif</label>

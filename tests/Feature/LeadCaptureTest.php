@@ -39,7 +39,7 @@ it('validates the contact form', function () {
 });
 
 it('blocks bots via honeypot and time trap', function () {
-    $this->post('/contact', contactPayload(['company_url' => 'http://spam.example']))->assertSessionHasErrors('email');
+    $this->post('/contact', contactPayload(['hp_trap' => 'http://spam.example']))->assertSessionHasErrors('email');
     $this->post('/contact', contactPayload(['_ts' => time()]))->assertSessionHasErrors('email');
 
     expect(Lead::count())->toBe(0);

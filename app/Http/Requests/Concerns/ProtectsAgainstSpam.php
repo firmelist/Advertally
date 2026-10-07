@@ -14,7 +14,7 @@ trait ProtectsAgainstSpam
     {
         return [
             function (Validator $validator) {
-                if ($this->filled('company_url')) {
+                if ($this->filled('hp_trap')) {
                     $validator->errors()->add('email', 'Something went wrong. Please try again.');
                 }
 
