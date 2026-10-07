@@ -13,7 +13,7 @@ return [
         'blocks' => [
             $block('hero', [
                 'eyebrow_tag' => 'AI-native', 'eyebrow' => 'Growth & Revenue Partner',
-                'headline' => 'Make Your Business Impossible to Ignore.',
+                'headline' => 'Make Your Business *Impossible to Ignore.*',
                 'subheadline' => 'Advertally builds AI-ready growth systems that help businesses get discovered, trusted and chosen across search, AI platforms and every digital touchpoint that matters.',
                 'primary_label' => 'Get Your Growth Score', 'primary_url' => '/growth-score',
                 'secondary_label' => 'Talk to an Expert', 'secondary_url' => '/contact',
@@ -118,10 +118,10 @@ return [
         'blocks' => [
             $block('hero', [
                 'eyebrow_tag' => 'About', 'eyebrow' => 'AI-native growth engineering',
-                'headline' => 'Marketing Changed. So Did We.',
+                'headline' => 'Marketing Changed. *So Did We.*',
                 'subheadline' => 'Advertally began in digital marketing execution. As discovery moved to AI and channels became interconnected, we rebuilt the company around one idea: growth is a system, not a set of services.',
                 'primary_label' => 'Get Your Growth Score', 'primary_url' => '/growth-score', 'secondary_label' => 'How we work', 'secondary_url' => '/approach',
-                'visual' => 'signal',
+                'visual' => 'evolution',
             ]),
             $block('comparison', [
                 'eyebrow' => 'Our evolution', 'headline' => 'From channels to a connected growth system.',
@@ -158,10 +158,10 @@ return [
         'blocks' => [
             $block('hero', [
                 'eyebrow_tag' => 'Approach', 'eyebrow' => 'How Advertally works',
-                'headline' => 'How Advertally Works.',
+                'headline' => 'How *Advertally* Works.',
                 'subheadline' => 'A disciplined, repeatable process that connects strategy, execution and technology around the outcomes that matter: qualified leads, pipeline and revenue.',
                 'primary_label' => 'Get Your Growth Score', 'primary_url' => '/growth-score', 'secondary_label' => 'Talk to an Expert', 'secondary_url' => '/contact',
-                'visual' => 'none',
+                'visual' => 'cycle',
             ]),
             $block('steps', [
                 'eyebrow' => 'Six steps', 'headline' => 'Diagnose. Discover. Build. Activate. Measure. Improve.',
@@ -200,10 +200,10 @@ return [
         'blocks' => [
             $block('hero', [
                 'eyebrow_tag' => 'Careers', 'eyebrow' => 'Build the next generation of growth',
-                'headline' => 'Do the best work of your career on growth that matters.',
+                'headline' => 'Do the best work of your career on *growth that matters.*',
                 'subheadline' => 'We are building a team of strategists, specialists and engineers who care about outcomes, think in systems and use AI to do better work — not less thinking.',
                 'primary_label' => 'Introduce yourself', 'primary_url' => '/contact', 'secondary_label' => null,
-                'visual' => 'none',
+                'visual' => 'constellation',
             ]),
             $block('features', [
                 'eyebrow' => 'How we work', 'headline' => 'What it is like at Advertally.',

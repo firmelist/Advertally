@@ -4,9 +4,14 @@
     <section class="bg-hero pt-10 pb-12 sm:pt-14">
         <div class="container-x">
             <x-breadcrumbs class="mb-10" />
-            <p class="eyebrow">Insights</p>
-            <h1 class="h-page mt-5 max-w-4xl">{{ $activeCategory ? $activeCategory->name : 'Thinking for leaders who own growth.' }}</h1>
-            <p class="lead mt-6 max-w-3xl">{{ $activeCategory?->description ?: 'Articles, frameworks and reports on AI search, B2B demand, authority, conversion, automation and measurement.' }}</p>
+            <div class="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
+                <div>
+                    <p class="eyebrow">Insights</p>
+                    <h1 class="h-page mt-5">@if ($activeCategory){{ $activeCategory->name }}@else Thinking for leaders who <span class="text-gradient-anim">own growth.</span>@endif</h1>
+                    <p class="lead mt-6">{{ $activeCategory?->description ?: 'Articles, frameworks and reports on AI search, B2B demand, authority, conversion, automation and measurement.' }}</p>
+                </div>
+                <x-hero.articles :categories="$categories" class="hidden lg:block" />
+            </div>
 
             <nav class="mt-10 flex flex-wrap gap-2" aria-label="Insight categories">
                 <a href="{{ route('insights.index') }}" @class(['chip', '!border-navy-900 !bg-navy-900 !text-white' => ! $activeCategory && ! $activeType])>All</a>

@@ -2,7 +2,7 @@
 
 @section('content')
     <article>
-        <header class="bg-navy-field relative overflow-hidden pt-10 pb-14 sm:pt-14">
+        <header class="bg-navy-field hero-dark relative overflow-hidden pt-10 pb-14 sm:pt-14">
             <div class="bg-dots-dark absolute inset-0 opacity-60" aria-hidden="true"></div>
             <div class="container-narrow relative">
                 <x-breadcrumbs class="mb-10" dark />

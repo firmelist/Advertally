@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="bg-navy-field relative overflow-hidden pt-10 pb-16 sm:pt-14 lg:pb-20">
+    <section class="bg-navy-field hero-dark relative overflow-hidden pt-10 pb-16 sm:pt-14 lg:pb-20">
         <div class="bg-dots-dark absolute inset-0 opacity-60" aria-hidden="true"></div>
         <div class="container-x relative">
             <x-breadcrumbs class="mb-10" dark />
@@ -9,8 +9,13 @@
                 <span>Advertally AI Search Lab</span>
                 <span>Research · Experiments · Frameworks</span>
             </div>
-            <h1 class="mt-10 max-w-4xl text-4xl leading-[1.05] font-extrabold tracking-tight text-white sm:text-6xl">How AI discovers, evaluates and recommends businesses.</h1>
-            <p class="mt-6 max-w-3xl text-lg leading-relaxed text-navy-200">Independent research into AI search, generative engines and B2B discovery. We publish our methods and our sources — and we say clearly what the data does and does not show.</p>
+            <div class="mt-10 grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
+                <div>
+                    <h1 class="text-4xl leading-[1.05] font-extrabold tracking-tight text-white sm:text-6xl">How AI discovers, evaluates and <span class="text-gradient-anim-dark">recommends</span> businesses.</h1>
+                    <p class="mt-6 text-lg leading-relaxed text-navy-200">Independent research into AI search, generative engines and B2B discovery. We publish our methods and our sources — and we say clearly what the data does and does not show.</p>
+                </div>
+                <x-hero.lab-plot class="relative" />
+            </div>
 
             <nav class="mt-10 flex flex-wrap gap-2" aria-label="Research categories">
                 <a href="{{ route('lab.index') }}" @class(['chip-dark hover:bg-white/10', '!bg-white !text-navy-900' => ! $activeCategory])>All research</a>

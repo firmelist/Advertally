@@ -4,9 +4,15 @@
     <section class="bg-hero pt-10 pb-16 sm:pt-14 lg:pb-20">
         <div class="container-x">
             <x-breadcrumbs class="mb-10" />
-            <p class="eyebrow">Growth Stories</p>
-            <h1 class="h-page mt-5 max-w-4xl">From diagnosis to measurable growth.</h1>
-            <p class="lead mt-6 max-w-3xl">Every story follows the same discipline: understand the business, diagnose the growth system, build what is missing and measure what changed.</p>
+            <div class="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr]">
+                <div>
+                    <p class="eyebrow">Growth Stories</p>
+                    <h1 class="h-page mt-5">From diagnosis to <span class="text-gradient-anim">measurable growth.</span></h1>
+                    <p class="lead mt-6">Every story follows the same discipline: understand the business, diagnose the growth system, build what is missing and measure what changed.</p>
+                    <x-cta-buttons class="mt-9" />
+                </div>
+                <x-hero.story-chart />
+            </div>
         </div>
     </section>
 

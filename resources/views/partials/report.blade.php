@@ -1,5 +1,5 @@
 {{-- Shared report layout for the Growth Score and AI Visibility Audit. --}}
-<section class="bg-navy-field relative overflow-hidden pt-12 pb-16 sm:pt-16">
+<section class="bg-navy-field hero-dark relative overflow-hidden pt-12 pb-16 sm:pt-16">
     <div class="bg-dots-dark absolute inset-0 opacity-60" aria-hidden="true"></div>
     <div class="container-x relative grid items-center gap-12 lg:grid-cols-[1.3fr_1fr]">
         <div>

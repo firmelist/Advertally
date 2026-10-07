@@ -65,7 +65,7 @@ it('saves the homepage block builder', function () {
         ->assertHasNoFormErrors();
 
     expect($home->fresh()->blocks)->toHaveCount(count($home->blocks));
-    $this->get('/')->assertOk()->assertSee('Make Your Business Impossible to Ignore.');
+    $this->get('/')->assertOk()->assertSee('Make Your Business')->assertSee('Impossible to Ignore.');
 });
 
 it('logs admin changes to the activity log', function () {

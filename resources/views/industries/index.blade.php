@@ -4,9 +4,15 @@
     <section class="bg-hero pt-10 pb-16 sm:pt-14 lg:pb-20">
         <div class="container-x">
             <x-breadcrumbs class="mb-10" />
-            <p class="eyebrow">Industries</p>
-            <h1 class="h-page mt-5 max-w-4xl">Built for markets where trust decides the deal.</h1>
-            <p class="lead mt-6 max-w-3xl">We focus on businesses with considered, high-value purchases — where buyers research deeply, compare carefully and increasingly ask AI before they ever speak to sales.</p>
+            <div class="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr]">
+                <div>
+                    <p class="eyebrow">Industries</p>
+                    <h1 class="h-page mt-5">Built for markets where <span class="text-gradient-anim">trust decides the deal.</span></h1>
+                    <p class="lead mt-6">We focus on businesses with considered, high-value purchases — where buyers research deeply, compare carefully and increasingly ask AI before they ever speak to sales.</p>
+                    <x-cta-buttons class="mt-9" />
+                </div>
+                <x-hero.industries :industries="$industries" />
+            </div>
         </div>
     </section>
 

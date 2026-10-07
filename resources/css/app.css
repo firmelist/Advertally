@@ -146,6 +146,77 @@
             radial-gradient(40rem 26rem at -8% 10%, rgb(6 182 212 / 0.06), transparent 60%),
             #fff;
     }
+    /* Living hero backdrop: drifting aurora + perspective grid floor, painted behind content (no markup needed). */
+    .bg-hero { position: relative; isolation: isolate; overflow: hidden; }
+    .bg-hero::before {
+        content: ''; position: absolute; inset: -25% -10%; z-index: -1; pointer-events: none;
+        background:
+            radial-gradient(28% 34% at 18% 28%, rgb(37 99 235 / .20), transparent 70%),
+            radial-gradient(26% 32% at 82% 18%, rgb(124 58 237 / .17), transparent 70%),
+            radial-gradient(30% 30% at 62% 78%, rgb(6 182 212 / .15), transparent 70%),
+            radial-gradient(22% 26% at 36% 70%, rgb(96 165 250 / .12), transparent 70%);
+        filter: blur(24px);
+        animation: hero-aurora 22s ease-in-out infinite alternate;
+    }
+    .bg-hero::after {
+        content: ''; position: absolute; left: -40%; right: -40%; bottom: -12%; height: 62%; z-index: -1; pointer-events: none;
+        background-image: linear-gradient(rgb(37 99 235 / .13) 1px, transparent 1px), linear-gradient(90deg, rgb(37 99 235 / .13) 1px, transparent 1px);
+        background-size: 64px 64px;
+        transform: perspective(520px) rotateX(64deg); transform-origin: bottom;
+        mask-image: linear-gradient(to top, black 10%, transparent 85%);
+        animation: hero-grid 5s linear infinite;
+    }
+    @keyframes hero-aurora {
+        0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+        50% { transform: translate3d(4%, -3%, 0) scale(1.08) rotate(4deg); }
+        100% { transform: translate3d(-4%, 3%, 0) scale(1.04) rotate(-3deg); }
+    }
+    @keyframes hero-grid { to { background-position: 0 64px, 0 0; } }
+
+    /* Dark hero variant (AI Search Lab, reports): drifting light beams + twinkling stars. */
+    .hero-dark { isolation: isolate; }
+    .hero-dark::before {
+        content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+        background: linear-gradient(115deg, transparent 40%, rgb(124 58 237 / .18) 50%, transparent 60%),
+            linear-gradient(115deg, transparent 55%, rgb(6 182 212 / .14) 62%, transparent 70%);
+        background-size: 250% 100%;
+        animation: hero-beam 9s ease-in-out infinite;
+    }
+    .hero-dark::after {
+        content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+        background-image: radial-gradient(1.5px 1.5px at 12% 22%, #fff, transparent), radial-gradient(1px 1px at 72% 14%, #a5f3fc, transparent),
+            radial-gradient(1.5px 1.5px at 86% 62%, #c4b5fd, transparent), radial-gradient(1px 1px at 38% 78%, #fff, transparent),
+            radial-gradient(1px 1px at 56% 40%, #93c5fd, transparent), radial-gradient(1.5px 1.5px at 24% 58%, #a5f3fc, transparent);
+        animation: hero-twinkle 4s ease-in-out infinite alternate;
+    }
+    @keyframes hero-beam { 0% { background-position: 120% 0; } 100% { background-position: -20% 0; } }
+    @keyframes hero-twinkle { from { opacity: .35; } to { opacity: 1; } }
+
+    /* Animated gradient text for highlighted headline words: *like this* in the CMS. */
+    .text-gradient-anim {
+        background: linear-gradient(100deg, #2563eb 0%, #7c3aed 30%, #06b6d4 55%, #2563eb 80%, #7c3aed 100%);
+        background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+        animation: text-shimmer 8s ease-in-out infinite;
+    }
+    @keyframes scn-conveyor { to { transform: translateX(-50%); } }
+    .text-gradient-anim-dark {
+        background: linear-gradient(100deg, #67e8f9 0%, #c4b5fd 35%, #93c5fd 65%, #67e8f9 100%);
+        background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+        animation: text-shimmer 8s ease-in-out infinite;
+    }
+    @keyframes text-shimmer { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+    /* Homepage hero: 3D stage + floating satellites */
+    .hero-stage { perspective: 1400px; }
+    .hero-tilt { transform: rotateY(var(--ry, -10deg)) rotateX(var(--rx, 6deg)); transform-style: preserve-3d; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+    .hero-sat { animation: hero-sat 9s ease-in-out infinite both; }
+    @keyframes hero-sat { 0% { opacity: 0; transform: translateY(14px) scale(.96); } 6%, 80% { opacity: 1; transform: none; } 88%, 100% { opacity: 0; transform: translateY(-10px); } }
+
+    @media (prefers-reduced-motion: reduce) {
+        .bg-hero::before, .bg-hero::after, .hero-dark::before, .hero-dark::after, .text-gradient-anim, .text-gradient-anim-dark, .hero-sat { animation: none !important; opacity: 1; }
+        .hero-tilt { transform: none !important; }
+    }
+
     .bg-navy-field {
         background:
             radial-gradient(48rem 26rem at 88% -10%, rgb(37 99 235 / 0.32), transparent 60%),

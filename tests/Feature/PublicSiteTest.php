@@ -9,7 +9,7 @@ use App\Models\ServiceCategory;
 
 it('renders the homepage with the core positioning and one H1', function () {
     $html = $this->get('/')->assertOk()
-        ->assertSee('Make Your Business Impossible to Ignore.')
+        ->assertSee('Make Your Business')->assertSee('Impossible to Ignore.')
         ->assertSee('One Growth System. Six Engines.')
         ->assertSee('Get Your Growth Score')
         ->assertSee('Sample data')
