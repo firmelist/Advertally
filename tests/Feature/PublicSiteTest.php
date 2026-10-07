@@ -12,7 +12,8 @@ it('renders the homepage with the core positioning and one H1', function () {
         ->assertSee('Make Your Business')->assertSee('Impossible to Ignore.')
         ->assertSee('One Growth System. Six Engines.')
         ->assertSee('Get Your Growth Score')
-        ->assertSee('Sample data')
+        ->assertSee('Advertally Growth OS: six engines working as one system')
+        ->assertSee('Know What Works.')
         ->getContent();
 
     expect(substr_count($html, '<h1'))->toBe(1);

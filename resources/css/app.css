@@ -199,6 +199,28 @@
         animation: text-shimmer 8s ease-in-out infinite;
     }
     @keyframes scn-conveyor { to { transform: translateX(-50%); } }
+
+    /* Growth OS Reactor (homepage hero): six 3s phases in one 18s loop; each engine's parts share its delay. */
+    .gos-node, .gos-card, .gos-flow { opacity: 0; }
+    .gos-node { animation: gos-node 18s ease-in-out infinite; }
+    .gos-card { animation: gos-card 18s ease-in-out infinite; }
+    .gos-flow { animation: gos-flow 18s linear infinite; }
+    .gos-revenue { animation: gos-revenue 18s ease-in-out infinite; }
+    .gos-bar { transform-origin: left; animation: gos-bar 18s ease-out infinite; }
+    .gos-draw { stroke-dasharray: 220; animation: gos-draw 18s ease-out infinite; }
+    @keyframes gos-node { 0% { opacity: 0; transform: scale(.85); } 2%, 15% { opacity: 1; transform: scale(1.08); } 17%, 100% { opacity: 0; transform: scale(1); } }
+    @keyframes gos-card { 0% { opacity: 0; transform: translateY(10px) scale(.98); } 2.5%, 15% { opacity: 1; transform: none; } 16.5%, 100% { opacity: 0; transform: translateY(-8px); } }
+    @keyframes gos-flow { 0%, 1% { opacity: 0; } 3%, 15% { opacity: 1; } 16.5%, 100% { opacity: 0; } }
+    @keyframes gos-revenue { 0% { width: 12%; } 92% { width: 100%; } 100% { width: 12%; } }
+    @keyframes gos-bar { 0%, 2% { transform: scaleX(0); } 9%, 100% { transform: scaleX(1); } }
+    @keyframes gos-draw { 0%, 2% { stroke-dashoffset: 220; } 11%, 100% { stroke-dashoffset: 0; } }
+    @media (prefers-reduced-motion: reduce) {
+        .gos-node, .gos-flow { animation: none !important; opacity: 0 !important; }
+        .gos-card { animation: none !important; opacity: 0 !important; }
+        .gos-card:first-child { opacity: 1 !important; }
+        .gos-revenue { animation: none !important; width: 70%; }
+        .gos-bar, .gos-draw { animation: none !important; transform: none; stroke-dashoffset: 0; }
+    }
     .text-gradient-anim-dark {
         background: linear-gradient(100deg, #67e8f9 0%, #c4b5fd 35%, #93c5fd 65%, #67e8f9 100%);
         background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;

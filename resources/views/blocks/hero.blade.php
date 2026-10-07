@@ -1,7 +1,7 @@
 @php
     $visual = $data['visual'] ?? 'none';
     $points = array_filter((array) ($data['trust_points'] ?? []));
-    $sideVisual = in_array($visual, ['dashboard', 'evolution', 'cycle', 'constellation'], true);
+    $sideVisual = in_array($visual, ['growth-os', 'dashboard', 'evolution', 'cycle', 'constellation'], true);
     // *words* in the CMS headline get the animated gradient treatment; everything else is escaped.
     $headline = preg_replace('/\*(.+?)\*/u', '<span class="text-gradient-anim">$1</span>', e($data['headline'] ?? ''));
 @endphp
@@ -65,6 +65,9 @@
             </div>
 
             @switch($visual)
+                @case('growth-os')
+                    <x-hero.growth-os class="lg:mr-0" />
+                    @break
                 @case('dashboard')
                     <x-hero-command-center class="mx-auto w-full max-w-[36rem] lg:mr-0" :data="array_filter(['scores' => $data['dashboard_scores'] ?? null, 'funnel' => $data['dashboard_funnel'] ?? null])" />
                     @break

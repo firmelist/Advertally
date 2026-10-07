@@ -67,7 +67,7 @@ class PageResource extends Resource
                 Forms\Components\Textarea::make('subheadline')->rows(3)->columnSpanFull(),
                 Forms\Components\TextInput::make('primary_label'), Forms\Components\TextInput::make('primary_url'),
                 Forms\Components\TextInput::make('secondary_label'), Forms\Components\TextInput::make('secondary_url'),
-                Forms\Components\Select::make('visual')->options(['dashboard' => '3D Growth Intelligence dashboard (sample data)', 'evolution' => 'Channels → connected system', 'cycle' => 'Growth cycle wheel', 'constellation' => 'Team constellation', 'signal' => 'Advertally Signal', 'none' => 'None'])->default('none')->native(false),
+                Forms\Components\Select::make('visual')->options(['growth-os' => 'Growth OS Reactor (all six engines)', 'dashboard' => '3D Growth Intelligence dashboard (sample data)', 'evolution' => 'Channels → connected system', 'cycle' => 'Growth cycle wheel', 'constellation' => 'Team constellation', 'signal' => 'Advertally Signal', 'none' => 'None'])->default('none')->native(false),
                 $strings('trust_points', 'Check-marked points under the buttons'),
                 Forms\Components\Repeater::make('dashboard_scores')->label('Dashboard scores (sample data)')->schema([
                     Forms\Components\TextInput::make('label')->required(), Forms\Components\TextInput::make('value')->numeric()->minValue(0)->maxValue(100)->required(),

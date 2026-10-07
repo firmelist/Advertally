@@ -17,7 +17,7 @@ return [
                 'subheadline' => 'Advertally builds AI-ready growth systems that help businesses get discovered, trusted and chosen across search, AI platforms and every digital touchpoint that matters.',
                 'primary_label' => 'Get Your Growth Score', 'primary_url' => '/growth-score',
                 'secondary_label' => 'Talk to an Expert', 'secondary_url' => '/contact',
-                'visual' => 'dashboard',
+                'visual' => 'growth-os',
                 'trust_points' => [],
             ]),
             $block('trust', [
