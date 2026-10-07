@@ -11,17 +11,17 @@
             @endif
         </div>
 
-        <div class="mt-14 grid gap-6 lg:grid-cols-[22rem_1fr]" x-data="{ active: 0 }">
+        <div class="mt-14 grid grid-cols-1 gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]" x-data="{ active: 0 }">
             {{-- engine selector --}}
-            <div class="relative" role="tablist" aria-label="Growth OS engines" aria-orientation="vertical">
+            <div class="relative min-w-0" role="tablist" aria-label="Growth OS engines" aria-orientation="vertical">
                 <span class="absolute top-6 bottom-6 left-[27px] hidden w-px bg-gradient-to-b from-signal-500 via-ai-600 to-brand-600 lg:block" aria-hidden="true"></span>
-                <div class="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0 [scrollbar-width:none]">
+                <div class="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 lg:flex-col lg:overflow-visible lg:pb-0 [scrollbar-width:none]">
                     @foreach ($engines as $i => $engine)
                         <button type="button" role="tab" id="engine-tab-{{ $i }}" aria-controls="engine-panel-{{ $i }}"
                             :aria-selected="(active === {{ $i }}).toString()" :tabindex="active === {{ $i }} ? 0 : -1"
-                            @click="active = {{ $i }}" @keydown.arrow-down.prevent="active = (active + 1) % {{ $engines->count() }}; $el.nextElementSibling?.focus()"
+                            @click="active = {{ $i }}; $el.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })" @keydown.arrow-down.prevent="active = (active + 1) % {{ $engines->count() }}; $el.nextElementSibling?.focus()"
                             @keydown.arrow-up.prevent="active = (active + {{ $engines->count() - 1 }}) % {{ $engines->count() }}; $el.previousElementSibling?.focus()"
-                            class="relative flex shrink-0 items-center gap-4 rounded-2xl border px-3 py-3 text-left transition lg:w-full"
+                            class="relative flex shrink-0 snap-start items-center gap-4 rounded-2xl border px-3 py-3 text-left transition lg:w-full"
                             :class="active === {{ $i }} ? 'border-brand-200 bg-brand-50/60 shadow-[var(--shadow-card)]' : 'border-transparent hover:bg-canvas'">
                             <span class="relative z-10 grid size-8 shrink-0 place-items-center rounded-full text-xs font-bold ring-4 ring-white transition"
                                 :class="active === {{ $i }} ? 'bg-brand-600 text-white' : 'bg-navy-50 text-navy-600'">{{ $engine->number }}</span>
@@ -35,7 +35,7 @@
             </div>
 
             {{-- engine detail --}}
-            <div class="relative">
+            <div class="relative min-w-0">
                 @foreach ($engines as $i => $engine)
                     <div role="tabpanel" id="engine-panel-{{ $i }}" aria-labelledby="engine-tab-{{ $i }}"
                         x-show="active === {{ $i }}" @if ($i) x-cloak @endif

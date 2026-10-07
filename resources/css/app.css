@@ -86,6 +86,8 @@
 @layer base {
     html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; text-rendering: optimizeLegibility; }
     body { @apply bg-canvas font-sans text-body antialiased; font-feature-settings: 'ss01', 'cv11'; }
+    /* Never allow sideways page scroll on phones (clip keeps the sticky header working). */
+    html, body { overflow-x: clip; }
     h1, h2, h3, h4, h5 { @apply tracking-tight text-ink; text-wrap: balance; }
     p { text-wrap: pretty; }
     ::selection { @apply bg-brand-100 text-navy-900; }
