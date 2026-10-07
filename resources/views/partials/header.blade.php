@@ -1,4 +1,4 @@
-<header x-data="{ ...megaMenu(), drawer: false, scrolled: false }"
+﻿<header x-data="megaMenu"
     x-init="scrolled = window.scrollY > 8"
     @scroll.window.passive="scrolled = window.scrollY > 8"
     @keydown.escape.window="close(); drawer = false"
@@ -108,8 +108,9 @@
         </div>
     </div>
 
-    {{-- Mobile drawer --}}
-    <div id="mobile-drawer" x-show="drawer" x-cloak class="fixed inset-0 z-50 flex flex-col bg-white lg:hidden" role="dialog" aria-modal="true" aria-label="Menu"
+    {{-- Mobile drawer: teleported to <body> so the header's backdrop blur cannot shrink it --}}
+    <template x-teleport="body">
+    <div id="mobile-drawer" x-show="drawer" x-cloak class="fixed inset-0 z-[60] flex flex-col bg-white lg:hidden" role="dialog" aria-modal="true" aria-label="Menu"
         x-transition:enter="transition duration-200" x-transition:enter-start="opacity-0" x-transition:leave="transition duration-150" x-transition:leave-end="opacity-0"
         x-trap.noscroll="drawer">
         <div class="container-x flex h-[68px] shrink-0 items-center justify-between border-b border-line">
@@ -159,4 +160,5 @@
             <a href="{{ route('contact') }}" class="btn-secondary w-full">Talk to an Expert</a>
         </div>
     </div>
+    </template>
 </header>

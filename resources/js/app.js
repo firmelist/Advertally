@@ -65,6 +65,8 @@ Alpine.data('scoreRing', (score = 0) => ({
 Alpine.data('megaMenu', () => ({
     open: null,
     timer: null,
+    drawer: false,
+    scrolled: window.scrollY > 8,
     show(id) { clearTimeout(this.timer); this.open = id; },
     hide() { this.timer = setTimeout(() => { this.open = null; }, 140); },
     toggle(id) { this.open = this.open === id ? null : id; },
