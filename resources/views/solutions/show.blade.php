@@ -4,7 +4,8 @@
     $isTalent = $category->group === 'talent';
     $flow = array_values(array_filter((array) $category->flow));
     $metrics = array_values(array_filter((array) $category->metrics));
-    $orbit = \App\Support\Orbit::forCategory($category);
+    $scene = \App\Support\Scenes::forCategory($category);
+    $orbit = $scene ? null : \App\Support\Orbit::forCategory($category);
 @endphp
 
 @section('content')
@@ -35,8 +36,12 @@
                     @endif
                 </div>
 
-                {{-- animated orbit visual --}}
-                <x-orbit :center="$orbit['center']" :nodes="$orbit['nodes']" />
+                {{-- animated hero visual: a scene that acts out this engine (orbit for Growth Technology) --}}
+                @if ($scene)
+                    <x-scene :scene="$scene" />
+                @else
+                    <x-orbit :center="$orbit['center']" :nodes="$orbit['nodes']" />
+                @endif
             </div>
         </div>
     </section>

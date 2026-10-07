@@ -3,7 +3,7 @@
 @php
     $isTalent = $category->group === 'talent';
     $steps = $service->processSteps();
-    $orbit = \App\Support\Orbit::forService($service);
+    $scene = \App\Support\Scenes::forService($service);
 @endphp
 
 @section('content')
@@ -24,7 +24,7 @@
                         <x-cta-buttons class="mt-9" />
                     @endif
                 </div>
-                <x-orbit :center="$orbit['center']" :nodes="$orbit['nodes']" class="self-center" />
+                <x-scene :scene="$scene" class="self-center" />
             </div>
         </div>
     </section>
