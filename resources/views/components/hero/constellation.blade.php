@@ -15,11 +15,11 @@
         <div class="absolute -translate-x-1/2 -translate-y-1/2" style="left: {{ $x }}%; top: {{ $y }}%">
             <div class="scn-float flex flex-col items-center" style="--d:-{{ $i * .7 }}s">
                 <span @class(['relative grid place-items-center rounded-full text-sm font-bold text-white shadow-[var(--shadow-lift)] ring-4 ring-white',
-                    'size-16 bg-gradient-to-br from-navy-700 to-navy-900' => $i === 7, 'size-12 '.['bg-signal-500', 'bg-brand-600', 'bg-ai-600', 'bg-brand-500'][$i % 4] => $i !== 7])>
-                    <x-glyph :name="['compass', 'search', 'megaphone', 'file-text', 'gauge', 'code', 'chart', 'workflow'][$i]" class="size-5" />
+                    'size-12 sm:size-16 bg-gradient-to-br from-navy-700 to-navy-900' => $i === 7, 'size-10 sm:size-12 '.['bg-signal-500', 'bg-brand-600', 'bg-ai-600', 'bg-brand-500'][$i % 4] => $i !== 7])>
+                    <x-glyph :name="['compass', 'search', 'megaphone', 'file-text', 'gauge', 'code', 'chart', 'workflow'][$i]" class="size-4 sm:size-5" />
                     <span class="scn-pulse absolute inset-0 rounded-full border-2 border-white/70" style="--t:3s; --d:{{ $i * .4 }}s"></span>
                 </span>
-                <span class="mt-1.5 rounded-full bg-white/90 px-2 text-[11px] font-bold whitespace-nowrap text-ink shadow-xs">{{ $role }}</span>
+                <span class="mt-1 rounded-full bg-white/90 px-1.5 text-[10px] font-bold whitespace-nowrap text-ink shadow-xs sm:mt-1.5 sm:px-2 sm:text-[11px]">{{ $role }}</span>
             </div>
         </div>
     @endforeach

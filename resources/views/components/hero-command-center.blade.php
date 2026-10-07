@@ -4,13 +4,13 @@
     rotating orbit ring, with satellites (lead toast, AI citation, visibility sparkline) sliding in around it.
     All figures are sample data and labelled as such.
 --}}
-<div {{ $attributes->merge(['class' => 'hero-stage relative']) }}
+<div {{ $attributes->merge(['class' => 'hero-stage relative min-w-0']) }}
     x-data="{ rx: 6, ry: -10 }"
-    @mousemove="const r = $el.getBoundingClientRect(); ry = ((($event.clientX - r.left) / r.width) - .5) * 14; rx = -((($event.clientY - r.top) / r.height) - .5) * 10"
+    @mousemove="if (window.innerWidth < 1024) return; const r = $el.getBoundingClientRect(); ry = ((($event.clientX - r.left) / r.width) - .5) * 14; rx = -((($event.clientY - r.top) / r.height) - .5) * 10"
     @mouseleave="rx = 6; ry = -10">
 
     {{-- orbit ring + beams behind the dashboard --}}
-    <div class="pointer-events-none absolute top-1/2 left-1/2 -z-0 aspect-square w-[118%] -translate-x-1/2 -translate-y-1/2" aria-hidden="true">
+    <div class="pointer-events-none absolute top-1/2 left-1/2 -z-0 hidden aspect-square w-[118%] -translate-x-1/2 -translate-y-1/2 lg:block" aria-hidden="true">
         <svg class="size-full" viewBox="0 0 100 100" fill="none" style="animation: orbit-spin 50s linear infinite">
             <circle cx="50" cy="50" r="48" stroke="url(#hero-ring)" stroke-width=".35" stroke-dasharray="1 2.2" stroke-linecap="round"/>
             <circle cx="50" cy="2" r="1.1" fill="#7C3AED"/><circle cx="98" cy="50" r=".9" fill="#06B6D4"/><circle cx="14" cy="84" r=".8" fill="#2563EB"/>
@@ -25,7 +25,7 @@
     </div>
 
     {{-- satellites --}}
-    <div class="pointer-events-none absolute inset-0 z-20 hidden sm:block" aria-hidden="true">
+    <div class="pointer-events-none absolute inset-0 z-20 hidden xl:block" aria-hidden="true">
         <div class="hero-sat absolute -top-5 -left-6 flex items-center gap-2.5 rounded-2xl border border-white bg-white/90 py-2 pr-4 pl-2 shadow-[var(--shadow-lift)] backdrop-blur" style="animation-delay: .4s">
             <span class="grid size-8 place-items-center rounded-xl bg-growth-50 text-growth-600"><x-glyph name="zap" class="size-4" /></span>
             <span class="text-left">

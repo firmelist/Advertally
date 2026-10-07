@@ -10,17 +10,17 @@
         @php $a = deg2rad(-90 + $i * 360 / $n); $x = 50 + 40 * cos($a); $y = 50 + 40 * sin($a); @endphp
         <div class="absolute -translate-x-1/2 -translate-y-1/2" style="left: {{ $x }}%; top: {{ $y }}%">
             <div class="flex flex-col items-center">
-                <span class="relative grid size-12 place-items-center rounded-2xl bg-white text-brand-700 shadow-[var(--shadow-card)] ring-1 ring-line">
-                    <x-glyph :name="$industry->icon ?: 'building'" class="size-5" />
+                <span class="relative grid size-10 place-items-center rounded-2xl bg-white text-brand-700 shadow-[var(--shadow-card)] ring-1 ring-line sm:size-12">
+                    <x-glyph :name="$industry->icon ?: 'building'" class="size-4 sm:size-5" />
                     <span class="absolute inset-0 rounded-2xl ring-2 ring-brand-500" style="animation: cyc-on 10s linear infinite; animation-delay: {{ $i * 10 / $n - 10 }}s"></span>
                 </span>
-                <span class="mt-1.5 rounded-full bg-white/90 px-2 text-[11px] font-bold whitespace-nowrap text-ink shadow-xs">{{ $industry->name }}</span>
+                <span class="mt-1 block max-w-[5rem] rounded-lg bg-white/90 px-1.5 text-center text-[10px] leading-tight font-bold text-ink shadow-xs sm:mt-1.5 sm:max-w-none sm:rounded-full sm:px-2 sm:text-[11px] sm:whitespace-nowrap">{{ $industry->name }}</span>
             </div>
         </div>
     @endforeach
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-        <div class="orbit-core mx-auto grid size-20 place-items-center rounded-[1.5rem] bg-navy-900 text-white"><x-glyph name="network" class="size-8" /></div>
-        <p class="mt-2 text-xs font-bold text-ink">Considered, high-value markets</p>
+        <div class="orbit-core mx-auto grid size-14 place-items-center rounded-[1.2rem] bg-navy-900 text-white sm:size-20 sm:rounded-[1.5rem]"><x-glyph name="network" class="size-6 sm:size-8" /></div>
+        <p class="mt-2 max-w-[7rem] text-[11px] leading-tight font-bold text-ink sm:max-w-none sm:text-xs">Considered, high-value markets</p>
     </div>
 </div>
 <style>@keyframes cyc-on { 0%, 2% { opacity: 0; transform: scale(.85); } 5%, 20% { opacity: 1; transform: none; } 26%, 100% { opacity: 0; } }</style>

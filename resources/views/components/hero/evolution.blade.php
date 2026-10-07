@@ -28,8 +28,8 @@
         @php $a = deg2rad(-90 + $i * 60); $x = 50 + 36 * cos($a); $y = 50 + 36 * sin($a); @endphp
         <div class="absolute -translate-x-1/2 -translate-y-1/2" style="left: {{ $x }}%; top: {{ $y }}%">
             <div class="flex flex-col items-center" style="animation: evo-new 10s cubic-bezier(.2,.9,.3,1.2) infinite both; animation-delay: {{ 3.6 + $i * .2 }}s">
-                <span class="grid size-12 place-items-center rounded-2xl bg-white text-brand-700 shadow-[var(--shadow-lift)] ring-1 ring-brand-100"><x-glyph :name="$icon" class="size-5" /></span>
-                <span class="mt-1.5 rounded-full bg-white/90 px-2 text-[11px] font-bold whitespace-nowrap text-ink shadow-xs">{{ $label }}</span>
+                <span class="grid size-10 place-items-center rounded-2xl bg-white text-brand-700 shadow-[var(--shadow-lift)] ring-1 ring-brand-100 sm:size-12"><x-glyph :name="$icon" class="size-4 sm:size-5" /></span>
+                <span class="mt-1 rounded-full bg-white/90 px-1.5 text-[10px] font-bold whitespace-nowrap text-ink shadow-xs sm:mt-1.5 sm:px-2 sm:text-[11px]">{{ $label }}</span>
             </div>
         </div>
     @endforeach

@@ -208,7 +208,11 @@
 
     /* Homepage hero: 3D stage + floating satellites */
     .hero-stage { perspective: 1400px; }
-    .hero-tilt { transform: rotateY(var(--ry, -10deg)) rotateX(var(--rx, 6deg)); transform-style: preserve-3d; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+    .hero-tilt { transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+    /* 3D tilt only where there is room (and a mouse); phones and tablets get a flat, full-width card. */
+    @media (min-width: 1024px) {
+        .hero-tilt { transform: rotateY(var(--ry, -10deg)) rotateX(var(--rx, 6deg)); transform-style: preserve-3d; }
+    }
     .hero-sat { animation: hero-sat 9s ease-in-out infinite both; }
     @keyframes hero-sat { 0% { opacity: 0; transform: translateY(14px) scale(.96); } 6%, 80% { opacity: 1; transform: none; } 88%, 100% { opacity: 0; transform: translateY(-10px); } }
 

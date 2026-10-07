@@ -12,11 +12,11 @@
         @php $a = deg2rad(-90 + $i * 60); $x = 50 + 38 * cos($a); $y = 50 + 38 * sin($a); @endphp
         <div class="absolute -translate-x-1/2 -translate-y-1/2" style="left: {{ $x }}%; top: {{ $y }}%">
             <div class="flex flex-col items-center">
-                <span class="relative grid size-14 place-items-center rounded-2xl bg-white text-navy-500 shadow-[var(--shadow-card)] ring-1 ring-line">
-                    <x-glyph :name="$icon" class="size-6" />
-                    <span class="absolute inset-0 grid place-items-center rounded-2xl bg-gradient-to-br from-brand-600 to-ai-600 text-white shadow-[0_10px_30px_rgb(37_99_235/.45)]" style="animation: cyc-on 9s linear infinite; animation-delay: {{ $i * 1.5 - 9 }}s"><x-glyph :name="$icon" class="size-6" /></span>
+                <span class="relative grid size-11 place-items-center rounded-2xl bg-white text-navy-500 shadow-[var(--shadow-card)] ring-1 ring-line sm:size-14">
+                    <x-glyph :name="$icon" class="size-5 sm:size-6" />
+                    <span class="absolute inset-0 grid place-items-center rounded-2xl bg-gradient-to-br from-brand-600 to-ai-600 text-white shadow-[0_10px_30px_rgb(37_99_235/.45)]" style="animation: cyc-on 9s linear infinite; animation-delay: {{ $i * 1.5 - 9 }}s"><x-glyph :name="$icon" class="size-5 sm:size-6" /></span>
                 </span>
-                <span class="mt-1.5 rounded-full bg-white/90 px-2 text-xs font-bold text-ink shadow-xs"><span class="mr-1 font-mono text-brand-600">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span>{{ $label }}</span>
+                <span class="mt-1 rounded-full bg-white/90 px-1.5 text-[10px] font-bold whitespace-nowrap text-ink shadow-xs sm:mt-1.5 sm:px-2 sm:text-xs"><span class="mr-1 font-mono text-brand-600">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span>{{ $label }}</span>
             </div>
         </div>
     @endforeach

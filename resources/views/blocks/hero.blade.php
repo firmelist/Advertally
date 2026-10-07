@@ -13,8 +13,9 @@
             <x-breadcrumbs class="mb-8" />
         @endunless
 
-        <div @class(['grid items-center gap-14 lg:gap-16', 'lg:grid-cols-[1.02fr_1fr]' => $sideVisual])>
-            <div @class(['max-w-4xl' => ! $sideVisual])>
+        {{-- min-w-0 stops wide content (the engine ticker) from stretching the column past the screen on phones --}}
+        <div @class(['grid grid-cols-1 items-center gap-14 lg:gap-16', 'lg:grid-cols-[1.02fr_1fr]' => $sideVisual])>
+            <div @class(['min-w-0', 'max-w-4xl' => ! $sideVisual])>
                 @if (! empty($data['eyebrow']))
                     <p class="inline-flex items-center gap-2 rounded-full border border-brand-100 bg-white/80 py-1 pr-3.5 pl-1.5 text-xs font-semibold text-navy-700 shadow-xs backdrop-blur" data-reveal>
                         <span class="relative rounded-full bg-navy-900 px-2 py-0.5 text-[10px] font-bold tracking-wider text-white uppercase">
