@@ -72,6 +72,7 @@ class NavigationSeeder extends Seeder
             ['Approach', '/approach', 'How Advertally works.', 'compass'],
             ['Technology & Talent', '/technology-talent', 'Extend your team with specialists.', 'users'],
             ['Careers', '/careers', 'Build the next generation of growth.', 'briefcase'],
+            ['Internships', '/internships', 'Learn by working on real growth projects.', 'book'],
             ['Contact', '/contact', "Let's build your next growth engine.", 'mail'],
         ] as [$label, $url, $desc, $icon]) {
             $add('header', $label, $url, $company, ['description' => $desc, 'icon' => $icon]);
@@ -99,7 +100,7 @@ class NavigationSeeder extends Seeder
         }
 
         $col = $add('footer', 'Company');
-        foreach ([['About', '/about'], ['Approach', '/approach'], ['Careers', '/careers'], ['Contact', '/contact']] as [$label, $url]) {
+        foreach ([['About', '/about'], ['Approach', '/approach'], ['Careers', '/careers'], ['Internships', '/internships'], ['Contact', '/contact']] as [$label, $url]) {
             $add('footer', $label, $url, $col);
         }
 

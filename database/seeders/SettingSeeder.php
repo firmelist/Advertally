@@ -18,6 +18,7 @@ class SettingSeeder extends Seeder
             ['general', 'company_description', 'Company description (schema & llms.txt)', 'textarea', 'Advertally is an AI-native growth and revenue partner. It helps ambitious businesses become discoverable, trusted and chosen across search, AI platforms and every digital touchpoint that drives revenue.'],
             ['general', 'area_served', 'Area served', 'text', 'India and international markets'],
             ['contact', 'email', 'Public email', 'email', 'hello@advertally.com'],
+            ['contact', 'careers_email', 'Internship applications email (comma-separated; blank = lead alert emails)', 'text', null],
             ['contact', 'phone', 'Public phone', 'text', null],
             ['contact', 'address', 'Office address', 'textarea', null],
             ['contact', 'country', 'Country code', 'text', 'IN'],

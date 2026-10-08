@@ -6,6 +6,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\GrowthScoreController;
 use App\Http\Controllers\IndustryController;
 use App\Http\Controllers\InsightController;
+use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\LabController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PageController;
@@ -43,6 +44,11 @@ Route::get('/ai-search-lab', [LabController::class, 'index'])->name('lab.index')
 Route::get('/ai-search-lab/{slug}', [LabController::class, 'show'])->name('lab.show');
 
 Route::get('/resources', [PageController::class, 'resources'])->name('resources');
+
+// Internships
+Route::get('/internships', [InternshipController::class, 'index'])->name('internships.index');
+Route::get('/internships/{slug}', [InternshipController::class, 'show'])->name('internships.show');
+Route::post('/internships/{slug}/apply', [InternshipController::class, 'apply'])->middleware('throttle:leads')->name('internships.apply');
 
 // Signature products
 Route::get('/growth-score', [GrowthScoreController::class, 'show'])->name('growth-score');

@@ -27,7 +27,7 @@ class AccessSeeder extends Seeder
         Role::query()->updateOrCreate(['name' => 'super-admin'], ['label' => 'Super Admin', 'description' => 'Full access to everything, including users, roles and settings.', 'is_super' => true]);
 
         $grant(Role::query()->updateOrCreate(['name' => 'content-editor'], ['label' => 'Content Editor', 'description' => 'Manages website content, SEO and media. No access to leads.']),
-            ['services', 'industries', 'case_studies', 'insights', 'research', 'testimonials', 'pages', 'media', 'seo']);
+            ['services', 'industries', 'case_studies', 'insights', 'research', 'testimonials', 'pages', 'media', 'seo', 'careers']);
 
         $grant(Role::query()->updateOrCreate(['name' => 'growth-consultant'], ['label' => 'Growth Consultant', 'description' => 'Works assigned leads and audit requests. Receives round-robin lead assignment.']),
             ['leads', 'audits'], ['view', 'manage']);

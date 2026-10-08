@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AiResearch;
 use App\Models\CaseStudy;
+use App\Models\Internship;
 use App\Models\Industry;
 use App\Models\Page;
 use App\Models\Post;
@@ -45,6 +46,9 @@ class SeoController extends Controller
                 ->each(fn ($c) => $urls->push(['loc' => $c->url(), 'priority' => '0.4']));
             Post::query()->published()->get()
                 ->each(fn ($p) => $urls->push(['loc' => $p->url(), 'lastmod' => $p->updated_at, 'priority' => '0.6']));
+            $urls->push(['loc' => route('internships.index'), 'priority' => '0.5']);
+            Internship::query()->published()->get()
+                ->each(fn ($i) => $urls->push(['loc' => $i->url(), 'lastmod' => $i->updated_at, 'priority' => '0.5']));
             AiResearch::query()->published()->get()
                 ->each(fn ($r) => $urls->push(['loc' => $r->url(), 'lastmod' => $r->updated_at, 'priority' => '0.7']));
 
@@ -100,6 +104,10 @@ class SeoController extends Controller
             $out[] = '## Company';
             $out[] = '- [About]('.url('about').')';
             $out[] = '- [Approach]('.url('approach').')';
+            $out[] = '- [Internships]('.route('internships.index').'): Hands-on internships in digital marketing, development and AI.';
+            foreach (Internship::query()->published()->orderBy('sort_order')->get() as $internship) {
+                $out[] = "  - [{$internship->title}]({$internship->url()}): ".str($internship->summary)->squish();
+            }
             $out[] = '- [Contact]('.route('contact').')';
 
             return implode("\n", $out)."\n";

@@ -45,6 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 NavigationGroup::make('Growth')->icon('heroicon-o-arrow-trending-up'),
                 NavigationGroup::make('Website Content')->icon('heroicon-o-document-text'),
+                NavigationGroup::make('Careers')->icon('heroicon-o-academic-cap')->collapsed(),
                 NavigationGroup::make('Growth Score')->icon('heroicon-o-chart-pie')->collapsed(),
                 NavigationGroup::make('Site')->icon('heroicon-o-globe-alt')->collapsed(),
                 NavigationGroup::make('System')->icon('heroicon-o-lock-closed')->collapsed(),

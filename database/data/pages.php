@@ -202,7 +202,7 @@ return [
                 'eyebrow_tag' => 'Careers', 'eyebrow' => 'Build the next generation of growth',
                 'headline' => 'Do the best work of your career on *growth that matters.*',
                 'subheadline' => 'We are building a team of strategists, specialists and engineers who care about outcomes, think in systems and use AI to do better work — not less thinking.',
-                'primary_label' => 'Introduce yourself', 'primary_url' => '/contact', 'secondary_label' => null,
+                'primary_label' => 'Introduce yourself', 'primary_url' => '/contact', 'secondary_label' => 'View internships', 'secondary_url' => '/internships',
                 'visual' => 'constellation',
             ]),
             $block('features', [

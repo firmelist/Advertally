@@ -25,6 +25,8 @@ class Permission extends Model
         'media' => 'Media library',
         'seo' => 'SEO',
         'settings' => 'Settings',
+        'careers' => 'Internships, brands & projects',
+        'applications' => 'Internship applications',
         'users' => 'Users & roles',
         'activity' => 'Activity log',
     ];

@@ -38,6 +38,8 @@ it('renders every admin screen for a super admin', function () {
         Resources\MediaResource::class, Resources\AuditDimensionResource::class, Resources\NavigationItemResource::class,
         Resources\SeoMetadataResource::class, Resources\SettingResource::class, Resources\UserResource::class,
         Resources\RoleResource::class, Resources\ActivityLogResource::class,
+        Resources\InternshipResource::class, Resources\BrandResource::class, Resources\ClientProjectResource::class,
+        Resources\StatisticResource::class, Resources\InternshipApplicationResource::class,
     ];
 
     foreach ($resources as $resource) {
